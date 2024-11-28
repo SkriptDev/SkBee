@@ -90,10 +90,6 @@ elements:
     # Enable villager/merchant elements
     villager: true
 
-    # Enable VirtualFurnace elements
-    # This feature is semi-experimental, please use with caution
-    virtual-furnace: false
-
     # Enable world border elements
     world-border: true
 

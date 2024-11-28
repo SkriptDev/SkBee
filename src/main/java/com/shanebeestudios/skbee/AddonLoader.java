@@ -4,7 +4,6 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.test.runner.TestMode;
 import ch.njol.skript.util.Version;
 import com.shanebeestudios.skbee.api.listener.EntityListener;
 import com.shanebeestudios.skbee.api.listener.NBTListener;
@@ -16,9 +15,7 @@ import com.shanebeestudios.skbee.api.util.SkriptUtils;
 import com.shanebeestudios.skbee.api.util.Util;
 import com.shanebeestudios.skbee.config.BoundConfig;
 import com.shanebeestudios.skbee.config.Config;
-import com.shanebeestudios.skbee.elements.virtualfurnace.listener.VirtualFurnaceListener;
 import com.shanebeestudios.skbee.elements.worldcreator.objects.BeeWorldConfig;
-import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -124,7 +121,6 @@ public class AddonLoader {
         loadTeamElements();
         loadTickManagerElements();
         loadVillagerElements();
-        loadVirtualFurnaceElements();
         loadWorldBorderElements();
         loadWorldCreatorElements();
         loadChunkGenElements();
@@ -318,29 +314,6 @@ public class AddonLoader {
             Util.logLoading("&5Structure Elements &asuccessfully loaded");
         } catch (IOException ex) {
             ex.printStackTrace();
-            pluginManager.disablePlugin(this.plugin);
-        }
-    }
-
-    private void loadVirtualFurnaceElements() {
-        // Force load if running tests as this is defaulted to false in the config
-        if (!this.config.ELEMENTS_VIRTUAL_FURNACE && !TestMode.ENABLED) {
-            Util.logLoading("&5Virtual Furnace Elements &cdisabled via config");
-            return;
-        }
-        // PaperMC check
-        if (!Skript.classExists("net.kyori.adventure.text.Component")) {
-            Util.logLoading("&5Virtual Furnace Elements &cdisabled");
-            Util.logLoading("&7- Virtual Furnace require a PaperMC server.");
-            return;
-        }
-        try {
-            this.plugin.virtualFurnaceAPI = new VirtualFurnaceAPI(this.plugin, true);
-            pluginManager.registerEvents(new VirtualFurnaceListener(), this.plugin);
-            addon.loadClasses("com.shanebeestudios.skbee.elements.virtualfurnace");
-            Util.logLoading("&5Virtual Furnace Elements &asuccessfully loaded");
-        } catch (IOException e) {
-            e.printStackTrace();
             pluginManager.disablePlugin(this.plugin);
         }
     }
