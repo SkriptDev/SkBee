@@ -387,15 +387,6 @@ public class Types {
                 }
             }));
 
-        EnumWrapper<TreeType> TREE_TYPE = new EnumWrapper<>(TreeType.class, "", "tree");
-        Classes.registerClass(TREE_TYPE.getClassInfo("bukkittreetype")
-            .user("bukkit ?tree ?types?")
-            .name("Bukkit Tree Type")
-            .description("Represents the different types of trees.",
-                "NOTE: These are auto-generated and may differ between server versions.")
-            .after("structuretype")
-            .since("3.5.3"));
-
         EnumWrapper<Pose> POSE = new EnumWrapper<>(Pose.class, "", "pose");
         Classes.registerClass(POSE.getClassInfo("pose")
             .user("poses?")
