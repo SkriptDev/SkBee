@@ -48,7 +48,7 @@ public class ExprAttributeModifierOfItem extends SimpleExpression<AttributeModif
 
     static {
         Skript.registerExpression(ExprAttributeModifierOfItem.class, AttributeModifier.class, ExpressionType.COMBINED,
-            "[:default] [:transient] %attributetype% [attribute] modifier[:s] of %itemstacks/livingentities%");
+            "[:default] [:transient] %attribute% [attribute] modifier[:s] of %itemstacks/livingentities%");
     }
 
     private boolean single;
