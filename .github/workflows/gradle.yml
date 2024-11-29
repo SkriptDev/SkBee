@@ -52,7 +52,7 @@ jobs:
                     path: extra-plugins/
                     merge-multiple: true
             -   name: Run tests
-                uses: SkriptDev/skript-test-action@v1.3
+                uses: SkriptDev/skript-test-action@v1.4
                 with:
                     test_script_directory: src/test/scripts
                     skript_repo_ref: dev/update
