@@ -29,7 +29,7 @@ public class CondIsMinecraftTagged extends Condition {
     static {
         PropertyCondition.register(CondIsMinecraftTagged.class, PropertyCondition.PropertyType.BE,
             "tagged (with|as) [minecraft[ ]tag[s]] %minecrafttags%",
-            "materials/slots/itemstacks/blocks/blockdatas/entities");
+            "materials/itemstacks/blocks/blockdatas/entities");
     }
 
     private Expression<Object> objects;
