@@ -9,6 +9,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Direction;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import com.shanebeestudios.skbee.api.particle.ParticleUtil;
 import org.bukkit.Location;
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
     "`delta` = a vector with the maximum random offset. The position of each particle will be randomized positively and negatively by the offset parameters on each axis.",
     "Some particles use the delta to set color/direction if count is set to 0.",
     "`extra` = the extra data for this particle, depends on the particle used (normally speed).",
-    "`forc`e = whether to send the particle to players within an extended range and encourage ",
+    "`force` = whether to send the particle to players within an extended range and encourage ",
     "their client to render it regardless of settings (this only works when not using `for player[s]`) (default = false)",
     "`for %players%` = will only send this particle to a player, not the whole server."})
 @Examples({"make 3 of item particle using diamond at location of player",
@@ -57,7 +58,7 @@ public class EffParticle extends Effect {
     private Expression<Vector> delta;
     private Expression<Number> extra;
     @Nullable
-    private Expression<Object> data;
+    private Expression<?> data;
     @Nullable
     private Expression<Player> players;
     private boolean force;
@@ -65,15 +66,15 @@ public class EffParticle extends Effect {
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?> @NotNull [] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parseResult) {
-        count = (Expression<Number>) exprs[0];
-        particle = (Expression<Particle>) exprs[1];
-        data = (Expression<Object>) exprs[2];
-        location = Direction.combine((Expression<? extends Direction>) exprs[3], (Expression<? extends Location>) exprs[4]);
-        delta = (Expression<Vector>) exprs[5];
-        extra = (Expression<Number>) exprs[6];
-        players = (Expression<Player>) exprs[7];
-        force = parseResult.mark == 1;
-        return true;
+        this.count = (Expression<Number>) exprs[0];
+        this.particle = (Expression<Particle>) exprs[1];
+        this.data = LiteralUtils.defendExpression(exprs[2]);
+        this.location = Direction.combine((Expression<? extends Direction>) exprs[3], (Expression<? extends Location>) exprs[4]);
+        this.delta = (Expression<Vector>) exprs[5];
+        this.extra = (Expression<Number>) exprs[6];
+        this.players = (Expression<Player>) exprs[7];
+        this.force = parseResult.mark == 1;
+        return LiteralUtils.canInitSafely(this.data);
     }
 
     @Override

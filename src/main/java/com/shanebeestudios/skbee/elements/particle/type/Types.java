@@ -21,6 +21,7 @@ import org.bukkit.Vibration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("UnstableApiUsage")
 public class Types {
 
     static {
@@ -38,7 +39,6 @@ public class Types {
                 .since("1.9.0")
                 .parser(new Parser<>() {
 
-                    @SuppressWarnings("NullableProblems")
                     @Nullable
                     @Override
                     public Particle parse(String s, ParseContext context) {
@@ -47,7 +47,7 @@ public class Types {
 
                     @Override
                     public @NotNull String toString(Particle particle, int flags) {
-                        return "" + ParticleUtil.getName(particle);
+                        return ParticleUtil.getName(particle);
                     }
 
                     @Override
@@ -63,7 +63,6 @@ public class Types {
         Classes.registerClass(new ClassInfo<>(Particle.DustOptions.class, "dustoption")
             .name(ClassInfo.NO_DOC).user("dust ?options?")
             .parser(new Parser<>() {
-                @SuppressWarnings("NullableProblems")
                 @Override
                 public boolean canParse(ParseContext context) {
                     return false;
@@ -99,6 +98,14 @@ public class Types {
             .name(ClassInfo.NO_DOC).user("vibrations?")
             .parser(SkriptUtils.getDefaultParser()));
 
+        //noinspection UnstableApiUsage
+        if (ParticleUtil.HAS_TARGET_COLOR && Classes.getExactClassInfo(Particle.TargetColor.class) == null) {
+            Classes.registerClass(new ClassInfo<>(Particle.TargetColor.class, "targetcolor")
+                .name(ClassInfo.NO_DOC)
+                .user("target ?colors?")
+                .parser(SkriptUtils.getDefaultParser()));
+        }
+
 
         // == FUNCTIONS ==
 
@@ -108,7 +115,6 @@ public class Types {
             new Parameter<>("color", DefaultClasses.COLOR, true, null),
             new Parameter<>("size", DefaultClasses.NUMBER, true, null)
         }, Classes.getExactClassInfo(Particle.DustOptions.class), true) {
-            @SuppressWarnings("NullableProblems")
             @Override
             public Particle.DustOptions[] executeSimple(Object[][] params) {
                 org.bukkit.Color color = ((Color) params[0][0]).asBukkitColor();
@@ -128,7 +134,6 @@ public class Types {
             new Parameter<>("toColor", DefaultClasses.COLOR, true, null),
             new Parameter<>("size", DefaultClasses.NUMBER, true, null)
         }, Classes.getExactClassInfo(DustTransition.class), true) {
-            @SuppressWarnings("NullableProblems")
             @Override
             public DustTransition[] executeSimple(Object[][] params) {
                 org.bukkit.Color fromColor = ((Color) params[0][0]).asBukkitColor();
@@ -148,7 +153,6 @@ public class Types {
             new Parameter<>("to", DefaultClasses.LOCATION, true, null),
             new Parameter<>("arrivalTime", DefaultClasses.TIMESPAN, true, null)
         }, Classes.getExactClassInfo(Vibration.class), true) {
-            @SuppressWarnings({"NullableProblems", "removal"})
             @Override
             public Vibration[] executeSimple(Object[][] params) {
                 if (params[0].length == 0 || params[1].length == 0) {
@@ -158,7 +162,7 @@ public class Types {
                 Location origin = new Location(null, 0, 0, 0);
                 Location destination = (Location) params[0][0];
                 int arrivalTime = (int) ((Timespan) params[1][0]).getTicks();
-                Vibration vibration = new Vibration(origin, new Vibration.Destination.BlockDestination(destination), arrivalTime);
+                Vibration vibration = new Vibration(new Vibration.Destination.BlockDestination(destination), arrivalTime);
                 return new Vibration[]{vibration};
             }
         }.description("Creates a new vibration to be used with 'vibration' particle.",
@@ -167,6 +171,26 @@ public class Types {
                 "Requires MC 1.17+")
             .examples("set {_v} to vibration({loc}, 10 seconds)")
             .since("1.11.1"));
+
+        if (ParticleUtil.HAS_TARGET_COLOR) {
+            //noinspection DataFlowIssue
+            Functions.registerFunction(new SimpleJavaFunction<>("targetColor", new Parameter[]{
+                    new Parameter<>("target", DefaultClasses.LOCATION, true, null),
+                    new Parameter<>("color", DefaultClasses.COLOR, true, null)
+                }, Classes.getExactClassInfo(Particle.TargetColor.class), true) {
+                    @Override
+                    public Particle.TargetColor[] executeSimple(Object[][] params) {
+                        Location target = (Location) params[0][0];
+                        org.bukkit.Color color = ((Color) params[1][0]).asBukkitColor();
+                        return new Particle.TargetColor[]{new Particle.TargetColor(target, color)};
+                    }
+                }).description("Creates a new target color to be used with 'trail' particle.",
+                    "Takes in a location for the target (where the trail heads to) and the color.",
+                    "Requires Minecraft 1.21.2+")
+                .examples("set {_target} to targetColor(location of target block, blue)",
+                    "make 10 of trail using {_target} at location of player")
+                .since("3.6.2");
+        }
     }
 
 }
