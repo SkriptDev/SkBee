@@ -55,5 +55,5 @@ jobs:
                 uses: SkriptDev/skript-test-action@v1.1
                 with:
                     test_script_directory: src/test/scripts
-                    skript_repo_ref: 3.0.0-Beta1
+                    skript_repo_ref: dev/update
                     extra_plugins_directory: extra-plugins/
