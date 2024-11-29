@@ -129,11 +129,11 @@ public class ParticleUtil {
     private static String getDataType(Particle particle) {
         Class<?> dataType = particle.getDataType();
         if (dataType == ItemStack.class) {
-            return "itemtype";
+            return "material/itemstack";
         } else if (dataType == DustOptions.class) {
             return "dust-option";
         } else if (dataType == BlockData.class) {
-            return "blockdata/itemtype";
+            return "material/blockdata";
         } else if (dataType == DustTransition.class) {
             return "dust-transition";
         } else if (dataType == Vibration.class) {
@@ -178,10 +178,9 @@ public class ParticleUtil {
             return number.floatValue();
         } else if (dataType == Integer.class && data instanceof Number number) {
             return number.intValue();
-        } else if (dataType == ItemStack.class && data instanceof ItemStack itemStack) {
-            return itemStack;
-        } else if (dataType == ItemStack.class && data instanceof Material material) {
-            return new ItemStack(material);
+        } else if (dataType == ItemStack.class) {
+            if (data instanceof ItemStack itemStack) return itemStack;
+            if (data instanceof Material material) return new ItemStack(material);
         } else if (dataType == DustOptions.class && data instanceof DustOptions) {
             return data;
         } else if (dataType == DustTransition.class && data instanceof DustTransition) {

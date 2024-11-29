@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,8 +28,8 @@ public class CondBlockCanRandomTick extends Condition {
 
     static {
         Skript.registerCondition(CondBlockCanRandomTick.class,
-            "%blocks/blockdatas/itemtypes% can random[ly] tick",
-            "%blocks/blockdatas/itemtypes% (can't|cannot) random[ly] tick");
+            "%blocks/blockdatas/materials% can random[ly] tick",
+            "%blocks/blockdatas/materials% (can't|cannot) random[ly] tick");
     }
 
     private Expression<?> blocks;
@@ -52,9 +51,8 @@ public class CondBlockCanRandomTick extends Condition {
         return this.blocks.check(event, (Checker<Object>) object -> {
             if (object instanceof Block block) return block.getBlockData().isRandomlyTicked();
             else if (object instanceof BlockData blockData) return blockData.isRandomlyTicked();
-            else if (object instanceof ItemStack itemStack) {
-                Material material = itemStack.getType();
-                if (material.isBlock()) return material.createBlockData().isRandomlyTicked();
+            else if (object instanceof Material material && material.isBlock()) {
+                return material.createBlockData().isRandomlyTicked();
             }
             return false;
         }, isNegated());

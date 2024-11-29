@@ -26,7 +26,7 @@ public class ExprBlockDataItem extends SimplePropertyExpression<ItemStack, Block
 
     static {
         PropertyExpression.register(ExprBlockDataItem.class, BlockData.class,
-            "item [block[ ]](data|state)", "itemtypes");
+            "item [block[ ]](data|state)", "itemstacks");
     }
 
     @Override

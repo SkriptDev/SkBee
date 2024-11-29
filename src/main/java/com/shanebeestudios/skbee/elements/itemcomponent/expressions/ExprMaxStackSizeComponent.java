@@ -27,7 +27,8 @@ public class ExprMaxStackSizeComponent extends SimplePropertyExpression<ItemStac
 
     static {
         if (Skript.methodExists(ItemMeta.class, "setMaxStackSize", Integer.class)) {
-            register(ExprMaxStackSizeComponent.class, Number.class, "max stack size component", "itemtypes");
+            register(ExprMaxStackSizeComponent.class, Number.class,
+                "max stack size component", "itemstacks");
         }
     }
 

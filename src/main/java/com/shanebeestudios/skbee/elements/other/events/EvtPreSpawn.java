@@ -64,7 +64,7 @@ public class EvtPreSpawn extends SkriptEvent {
         // Paper - PreSpawnerSpawnEvent
         if (HAS_PRE_SPAWNER_SPAWN_EVENT) {
             Skript.registerEvent("Pre Spawner Spawn", EvtPreSpawn.class, PreSpawnerSpawnEvent.class,
-                    "pre spawner spawn[ing] [of %entitydatas%]")
+                    "pre spawner spawn[ing] [of %entitytypes/entitycategories%]")
                 .description("Called before an entity is spawned via a spawner. Requires a PaperMC server.",
                     "\nNote: The spawned entity does not exist when this event is called only the entitytype exists.",
                     "\nView the pre creature spawn event for more event values.",

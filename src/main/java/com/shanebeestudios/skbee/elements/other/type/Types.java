@@ -329,7 +329,7 @@ public class Types {
                 .name("Player Spawn Change Reason")
                 .description("Represents the reasons why a player changed their spawn location.",
                     "NOTE: These are auto-generated and may differ between server versions.")
-                .after("damagecause", "damagetype", "itemtype")
+                .after("damagecause", "damagetype", "material")
                 .since("3.4.0"));
         }
 

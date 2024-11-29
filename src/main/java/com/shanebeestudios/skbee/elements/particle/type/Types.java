@@ -34,7 +34,7 @@ public class Types {
                     "DustOption, DustTransition and Vibration each have their own functions to build the appropriate data for these particles.",
                     "NOTE: These are auto-generated and may differ between server versions.")
                 .usage(ParticleUtil.getNamesAsString())
-                .after("itemtype")
+                .after("material")
                 .since("1.9.0")
                 .parser(new Parser<>() {
 
