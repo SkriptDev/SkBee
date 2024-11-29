@@ -1,16 +1,13 @@
 package com.shanebeestudios.skbee.elements.villager.type;
 
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.registrations.Classes;
 import com.shanebeestudios.skbee.api.util.SkriptUtils;
 import com.shanebeestudios.skbee.api.util.Util;
 import com.shanebeestudios.skbee.api.wrapper.RegistryClassInfo;
 import org.bukkit.Registry;
-import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.entity.Villager.Type;
 import org.bukkit.inventory.ItemStack;
@@ -66,8 +63,6 @@ public class Types {
                 .since("1.17.0")
                 .after("entitydata")
                 .parser(new Parser<>() {
-
-                    @SuppressWarnings("NullableProblems")
                     @Override
                     public boolean canParse(ParseContext context) {
                         return false;
@@ -75,9 +70,6 @@ public class Types {
 
                     @Override
                     public @NotNull String toString(Merchant merchant, int i) {
-                        if (merchant instanceof AbstractVillager villager) {
-                            return EntityData.toString(villager, i);
-                        }
                         return "Merchant{trader=" + Classes.toString(merchant.getTrader()) + "}";
                     }
 
@@ -117,10 +109,10 @@ public class Types {
 
                     @Override
                     public @NotNull String toString(MerchantRecipe merchantRecipe, int i) {
-                        String result = ItemType.toString(merchantRecipe.getResult());
+                        String result = Classes.toString(merchantRecipe.getResult());
                         List<String> ingredients = new ArrayList<>();
                         for (ItemStack ingredient : merchantRecipe.getIngredients()) {
-                            ingredients.add(ItemType.toString(ingredient));
+                            ingredients.add(Classes.toString(ingredient));
                         }
                         int maxUses = merchantRecipe.getMaxUses();
                         int uses = merchantRecipe.getUses();

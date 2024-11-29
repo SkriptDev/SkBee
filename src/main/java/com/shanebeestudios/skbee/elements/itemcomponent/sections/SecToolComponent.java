@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.sections;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -16,6 +15,7 @@ import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.ToolComponent;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,6 @@ import org.skriptlang.skript.lang.entry.util.ExpressionEntryData;
 
 import java.util.List;
 
-@SuppressWarnings("DataFlowIssue")
 @Name("ItemComponent - Tool Component Apply")
 @Description({"Apply a tool component to any item making it usable tool. Requires Minecraft 1.20.5+",
     "See [**McWiki Tool Component**](https://minecraft.wiki/w/Data_component_format#tool) for more details.",
@@ -77,11 +76,11 @@ public class SecToolComponent extends Section {
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("default mining speed", null, true, Number.class));
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("damage per block", null, true, Number.class));
             VALIDATIOR.addSection("rules", true);
-            Skript.registerSection(SecToolComponent.class, "apply tool component to %itemtypes%");
+            Skript.registerSection(SecToolComponent.class, "apply tool component to %itemstacks%");
         }
     }
 
-    private Expression<ItemType> items;
+    private Expression<ItemStack> items;
     private Expression<Number> defaultMiningSpeed;
     private Expression<Number> damagePerBlock;
     private Trigger rulesSection;
@@ -92,7 +91,7 @@ public class SecToolComponent extends Section {
         EntryContainer container = VALIDATIOR.build().validate(sectionNode);
         if (container == null) return false;
 
-        this.items = (Expression<ItemType>) exprs[0];
+        this.items = (Expression<ItemStack>) exprs[0];
         this.defaultMiningSpeed = (Expression<Number>) container.getOptional("default mining speed", false);
         this.damagePerBlock = (Expression<Number>) container.getOptional("damage per block", false);
 
@@ -111,7 +110,7 @@ public class SecToolComponent extends Section {
         Number defaultMiningSpeed = this.defaultMiningSpeed != null ? this.defaultMiningSpeed.getSingle(event) : null;
         Number damagePerBlock = this.damagePerBlock != null ? this.damagePerBlock.getSingle(event) : null;
 
-        for (ItemType itemType : this.items.getArray(event)) {
+        for (ItemStack itemType : this.items.getArray(event)) {
             ItemMeta itemMeta = itemType.getItemMeta();
 
             ToolComponent tool = itemMeta.getTool();

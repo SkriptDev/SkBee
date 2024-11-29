@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.text.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -15,6 +14,7 @@ import ch.njol.util.coll.CollectionUtils;
 import com.shanebeestudios.skbee.api.wrapper.ComponentWrapper;
 import net.kyori.adventure.text.Component;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,11 +31,11 @@ import org.jetbrains.annotations.Nullable;
     "set component item name of player's tool to mini message from \"Stickaxe\"",
     "delete component item name of player's tool"})
 @Since("2.4.0")
-public class ExprItemName extends SimplePropertyExpression<ItemType, ComponentWrapper> {
+public class ExprItemName extends SimplePropertyExpression<ItemStack, ComponentWrapper> {
 
     static {
         register(ExprItemName.class, ComponentWrapper.class,
-            "component (:item|(custom|display)) name", "itemtypes");
+            "component (:item|(custom|display)) name", "itemstacks");
     }
 
     private boolean itemName;
@@ -52,7 +52,7 @@ public class ExprItemName extends SimplePropertyExpression<ItemType, ComponentWr
     }
 
     @Override
-    public @Nullable ComponentWrapper convert(ItemType itemType) {
+    public @Nullable ComponentWrapper convert(ItemStack itemType) {
         Component nameComponent;
         if (this.itemName) {
             nameComponent = itemType.getItemMeta().itemName();
@@ -75,7 +75,7 @@ public class ExprItemName extends SimplePropertyExpression<ItemType, ComponentWr
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         Component component = delta != null && delta[0] instanceof ComponentWrapper comp ? comp.getComponent() : null;
 
-        for (ItemType itemType : getExpr().getArray(event)) {
+        for (ItemStack itemType : getExpr().getArray(event)) {
             ItemMeta itemMeta = itemType.getItemMeta();
             if (this.itemName) itemMeta.itemName(component);
             else itemMeta.displayName(component);

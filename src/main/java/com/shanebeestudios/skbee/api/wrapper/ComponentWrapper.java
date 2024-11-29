@@ -1,12 +1,10 @@
 package com.shanebeestudios.skbee.api.wrapper;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.ColorRGB;
 import ch.njol.skript.util.SkriptColor;
-import ch.njol.skript.util.slot.Slot;
 import com.shanebeestudios.skbee.SkBee;
 import com.shanebeestudios.skbee.api.util.ChatUtil;
 import net.kyori.adventure.audience.Audience;
@@ -165,7 +163,7 @@ public class ComponentWrapper {
                 comps.add(Component.text(string));
             } else if (object instanceof Entity entity) {
                 comps.add(entity.name());
-            } else if (object instanceof ItemType || object instanceof ItemStack || object instanceof Slot) {
+            } else if (object instanceof ItemStack) {
                 comps.add(getItem(object));
             } else if (object instanceof Translatable translatable) {
                 comps.add(Component.translatable(translatable));
@@ -194,11 +192,6 @@ public class ComponentWrapper {
         Material material = null;
         if (object instanceof ItemStack is) {
             itemStack = is;
-        } else if (object instanceof ItemType itemType) {
-            itemStack = itemType.getRandom();
-            material = itemStack.getType();
-        } else if (object instanceof Slot slot) {
-            itemStack = slot.getItem();
         }
         if (itemStack == null) {
             return null;

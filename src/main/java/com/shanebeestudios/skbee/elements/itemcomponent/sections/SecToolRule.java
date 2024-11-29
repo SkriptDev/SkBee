@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.sections;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -59,7 +58,7 @@ public class SecToolRule extends Section {
 
     static {
         if (Skript.classExists("org.bukkit.inventory.meta.components.ToolComponent")) {
-            VALIDATIOR.addEntryData(new ExpressionEntryData<>("block types", null, true, ItemType.class));
+            VALIDATIOR.addEntryData(new ExpressionEntryData<>("block types", null, true, Material.class));
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("block tag", null, true, Tag.class));
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("speed", null, true, Number.class));
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("correct for drops", null, true, Boolean.class));
@@ -67,7 +66,7 @@ public class SecToolRule extends Section {
         }
     }
 
-    private Expression<ItemType> blockTypes;
+    private Expression<Material> blockTypes;
     private Expression<Tag<Material>> blockKey;
     private Expression<Number> speed;
     private Expression<Boolean> correctForDrops;
@@ -83,7 +82,7 @@ public class SecToolRule extends Section {
         EntryContainer container = VALIDATIOR.build().validate(sectionNode);
         if (container == null) return false;
 
-        this.blockTypes = (Expression<ItemType>) container.getOptional("block types", false);
+        this.blockTypes = (Expression<Material>) container.getOptional("block types", false);
         this.blockKey = (Expression<Tag<Material>>) container.getOptional("block tag", false);
         if (this.blockTypes == null && this.blockKey == null) {
             Skript.error("Either a 'block types' or 'block tag' entry needs to be used.");
@@ -107,8 +106,7 @@ public class SecToolRule extends Section {
 
             if (this.blockTypes != null) {
                 List<Material> blockMaterials = new ArrayList<>();
-                for (ItemType itemType : this.blockTypes.getArray(event)) {
-                    Material material = itemType.getMaterial();
+                for (Material material : this.blockTypes.getArray(event)) {
                     if (material.isBlock()) blockMaterials.add(material);
                 }
                 component.addRule(blockMaterials, speed, correctForDrops);

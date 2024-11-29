@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -10,6 +9,7 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,16 +25,17 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"set glint override of player's tool to true",
     "set glint override of player's tool to false"})
 @Since("3.6.0")
-public class ExprEnchantmentGlintOverride extends SimplePropertyExpression<ItemType, Boolean> {
+public class ExprEnchantmentGlintOverride extends SimplePropertyExpression<ItemStack, Boolean> {
 
     static {
         if (Skript.methodExists(ItemMeta.class, "getEnchantmentGlintOverride")) {
-            register(ExprEnchantmentGlintOverride.class, Boolean.class, "[enchantment] glint [override]", "itemtypes");
+            register(ExprEnchantmentGlintOverride.class, Boolean.class,
+                "[enchantment] glint [override]", "itemstacks");
         }
     }
 
     @Override
-    public @Nullable Boolean convert(ItemType itemType) {
+    public @Nullable Boolean convert(ItemStack itemType) {
         ItemMeta itemMeta = itemType.getItemMeta();
         if (!itemMeta.hasEnchantmentGlintOverride()) return null;
         return itemMeta.getEnchantmentGlintOverride();
@@ -52,7 +53,7 @@ public class ExprEnchantmentGlintOverride extends SimplePropertyExpression<ItemT
     @Override
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         Boolean glint = delta != null && delta[0] instanceof Boolean bool ? bool : null;
-        for (ItemType itemType : getExpr().getArray(event)) {
+        for (ItemStack itemType : getExpr().getArray(event)) {
             ItemMeta itemMeta = itemType.getItemMeta();
             itemMeta.setEnchantmentGlintOverride(glint);
             itemType.setItemMeta(itemMeta);

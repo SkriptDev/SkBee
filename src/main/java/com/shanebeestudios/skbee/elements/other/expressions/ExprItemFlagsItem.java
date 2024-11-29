@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -13,6 +12,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,30 +20,30 @@ import org.jetbrains.annotations.Nullable;
 @Name("ItemFlag - Item with ItemFlags")
 @Description("Get an item with ItemFlags.")
 @Examples({"set {_sword} to diamond sword with all item flags",
-        "set {_sword} to diamond sword of sharpness 3 with hide enchants item flag",
-        "set {_sword} to diamond sword of sharpness 3 with item flag hide enchants",
-        "give player fishing rod of lure 10 with item flag hide enchants",
-        "give player potion of extended regeneration with hide enchants itemflag",
-        "give player netherite leggings with itemflag hide attributes"})
+    "set {_sword} to diamond sword of sharpness 3 with hide enchants item flag",
+    "set {_sword} to diamond sword of sharpness 3 with item flag hide enchants",
+    "give player fishing rod of lure 10 with item flag hide enchants",
+    "give player potion of extended regeneration with hide enchants itemflag",
+    "give player netherite leggings with itemflag hide attributes"})
 @Since("3.4.0")
-public class ExprItemFlagsItem extends SimpleExpression<ItemType> {
+public class ExprItemFlagsItem extends SimpleExpression<ItemStack> {
 
     static {
-        Skript.registerExpression(ExprItemFlagsItem.class, ItemType.class, ExpressionType.COMBINED,
-                "%itemtype% with all item[ ]flags",
-                "%itemtype% with item[ ]flag[s] %itemflags%",
-                "%itemtype% with %itemflags% item[ ]flag[s]");
+        Skript.registerExpression(ExprItemFlagsItem.class, ItemStack.class, ExpressionType.COMBINED,
+            "%itemstack% with all item[ ]flags",
+            "%itemstack% with item[ ]flag[s] %itemflags%",
+            "%itemstack% with %itemflags% item[ ]flag[s]");
     }
 
     private int pattern;
-    private Expression<ItemType> itemType;
+    private Expression<ItemStack> itemStack;
     private Expression<ItemFlag> itemFlags;
 
     @SuppressWarnings({"NullableProblems", "unchecked"})
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         this.pattern = matchedPattern;
-        this.itemType = (Expression<ItemType>) exprs[0];
+        this.itemStack = (Expression<ItemStack>) exprs[0];
         if (matchedPattern > 0) {
             this.itemFlags = (Expression<ItemFlag>) exprs[1];
         }
@@ -52,16 +52,16 @@ public class ExprItemFlagsItem extends SimpleExpression<ItemType> {
 
     @SuppressWarnings("NullableProblems")
     @Override
-    protected ItemType @Nullable [] get(Event event) {
-        ItemType itemType = this.itemType.getSingle(event);
-        if (itemType == null) return null;
+    protected ItemStack @Nullable [] get(Event event) {
+        ItemStack itemStack = this.itemStack.getSingle(event);
+        if (itemStack == null) return null;
 
-        itemType = itemType.clone();
-        ItemMeta itemMeta = itemType.getItemMeta();
+        itemStack = itemStack.clone();
+        ItemMeta itemMeta = itemStack.getItemMeta();
         ItemFlag[] flags = this.pattern == 0 ? ItemFlag.values() : this.itemFlags.getArray(event);
         itemMeta.addItemFlags(flags);
-        itemType.setItemMeta(itemMeta);
-        return new ItemType[]{itemType};
+        itemStack.setItemMeta(itemMeta);
+        return new ItemStack[]{itemStack};
     }
 
     @Override
@@ -70,15 +70,15 @@ public class ExprItemFlagsItem extends SimpleExpression<ItemType> {
     }
 
     @Override
-    public @NotNull Class<? extends ItemType> getReturnType() {
-        return ItemType.class;
+    public @NotNull Class<? extends ItemStack> getReturnType() {
+        return ItemStack.class;
     }
 
     @SuppressWarnings("DataFlowIssue")
     @Override
     public @NotNull String toString(@Nullable Event e, boolean d) {
-        if (this.pattern == 0) return this.itemType.toString(e, d) + " with all item flags";
-        return this.itemType.toString(e, d) + " with item flag[s] " + this.itemFlags.toString(e, d);
+        if (this.pattern == 0) return this.itemStack.toString(e, d) + " with all item flags";
+        return this.itemStack.toString(e, d) + " with item flag[s] " + this.itemFlags.toString(e, d);
     }
 
 }

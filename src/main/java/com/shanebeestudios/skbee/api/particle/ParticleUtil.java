@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.api.particle;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.util.StringUtils;
 import com.shanebeestudios.skbee.api.reflection.ReflectionUtils;
 import com.shanebeestudios.skbee.api.util.Util;
@@ -179,8 +178,10 @@ public class ParticleUtil {
             return number.floatValue();
         } else if (dataType == Integer.class && data instanceof Number number) {
             return number.intValue();
-        } else if (dataType == ItemStack.class && data instanceof ItemType itemType) {
-            return itemType.getRandom();
+        } else if (dataType == ItemStack.class && data instanceof ItemStack itemStack) {
+            return itemStack;
+        } else if (dataType == ItemStack.class && data instanceof Material material) {
+            return new ItemStack(material);
         } else if (dataType == DustOptions.class && data instanceof DustOptions) {
             return data;
         } else if (dataType == DustTransition.class && data instanceof DustTransition) {
@@ -194,8 +195,7 @@ public class ParticleUtil {
         } else if (dataType == BlockData.class) {
             if (data instanceof BlockData) {
                 return data;
-            } else if (data instanceof ItemType itemType) {
-                Material material = itemType.getMaterial();
+            } else if (data instanceof Material material) {
                 if (material.isBlock()) {
                     return material.createBlockData();
                 }

@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.nbt.effects;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -14,6 +13,7 @@ import ch.njol.util.Kleenean;
 import com.shanebeestudios.skbee.api.nbt.NBTApi;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
@@ -22,18 +22,18 @@ import org.jetbrains.annotations.NotNull;
 @Name("NBT - Set Block with NBT")
 @Description("Set a block at a location to a block with NBT. BlockData is also supported when using MC 1.13+ and Skript 2.5+")
 @Examples({"set {_n} to nbt compound from \"{CustomName:\"\"{\\\"\"text\\\"\":\\\"\"&aFurnieFurnace\\\"\"}\"\"}\"",
-        "set nbt-block at player to west facing furnace with nbt {_n}",
-        "set nbt-block at player to furnace[facing=west] with nbt {_n}",
-        "set {_n} to nbt compound from \"{CustomName:\"\"{\\\"\"text\\\"\":\\\"\"&cHoppieHopper\\\"\"}\"\"}\"",
-        "set nbt-block at event-location to hopper with nbt {_n}",
-        "set {_nbt} to nbt compound from \"{custom:{BlockOwner:\"%uuid of player%\"}}\"",
-        "set nbt-block at player to coal ore with nbt {_n}"})
+    "set nbt-block at player to west facing furnace with nbt {_n}",
+    "set nbt-block at player to furnace[facing=west] with nbt {_n}",
+    "set {_n} to nbt compound from \"{CustomName:\"\"{\\\"\"text\\\"\":\\\"\"&cHoppieHopper\\\"\"}\"\"}\"",
+    "set nbt-block at event-location to hopper with nbt {_n}",
+    "set {_nbt} to nbt compound from \"{custom:{BlockOwner:\"%uuid of player%\"}}\"",
+    "set nbt-block at player to coal ore with nbt {_n}"})
 @Since("1.0.0")
 public class EffSetBlockNBT extends Effect {
 
     static {
         Skript.registerEffect(EffSetBlockNBT.class,
-                "set (nbt[(-| )]block|tile[(-| )]entity) %directions% %locations% to %itemtype/blockdata% with [nbt] %nbtcompound%");
+            "set (nbt[(-| )]block|tile[(-| )]entity) %directions% %locations% to %material/blockdata% with [nbt] %nbtcompound%");
     }
 
     @SuppressWarnings("null")
@@ -63,9 +63,8 @@ public class EffSetBlockNBT extends Effect {
             Block block = loc.getBlock();
             if (typeObject instanceof BlockData blockData) {
                 block.setBlockData(blockData);
-            } else {
-                ItemType itemType = ((ItemType) typeObject);
-                itemType.setBlock(block, true);
+            } else if (typeObject instanceof Material material) {
+                block.setType(material);
             }
             NBTApi.addNBTToBlock(block, compound);
         }
@@ -74,7 +73,7 @@ public class EffSetBlockNBT extends Effect {
     @Override
     public @NotNull String toString(Event e, boolean debug) {
         return "set block " + locations.toString(e, debug) + " to " +
-                type.toString(e, debug) + " with nbt " + nbt.toString(e, debug);
+            type.toString(e, debug) + " with nbt " + nbt.toString(e, debug);
     }
 
 }

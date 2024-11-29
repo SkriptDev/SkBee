@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -21,14 +20,14 @@ import org.jetbrains.annotations.Nullable;
 @Name("Entity Shoot Bow - Shot Bow")
 @Description("Gets the bow Item used to fire the arrow in an entity shoot bow event.")
 @Examples({"on entity shoot bow:",
-        "\tif name of shot bow != \"Mr Bow\":",
-        "\t\tcancel event"})
+    "\tif name of shot bow != \"Mr Bow\":",
+    "\t\tcancel event"})
 @Since("2.16.0")
-public class ExprShootBowShotBow extends SimpleExpression<ItemType> {
+public class ExprShootBowShotBow extends SimpleExpression<ItemStack> {
 
     static {
-        Skript.registerExpression(ExprShootBowShotBow.class, ItemType.class, ExpressionType.SIMPLE,
-                "shot bow");
+        Skript.registerExpression(ExprShootBowShotBow.class, ItemStack.class, ExpressionType.SIMPLE,
+            "shot bow");
     }
 
     @SuppressWarnings("NullableProblems")
@@ -43,10 +42,10 @@ public class ExprShootBowShotBow extends SimpleExpression<ItemType> {
 
     @SuppressWarnings("NullableProblems")
     @Override
-    protected @Nullable ItemType[] get(Event event) {
+    protected @Nullable ItemStack[] get(Event event) {
         if (event instanceof EntityShootBowEvent shootBowEvent) {
             ItemStack bow = shootBowEvent.getBow();
-            if (bow != null) return new ItemType[]{new ItemType(bow)};
+            if (bow != null) return new ItemStack[]{bow};
         }
         return null;
     }
@@ -57,8 +56,8 @@ public class ExprShootBowShotBow extends SimpleExpression<ItemType> {
     }
 
     @Override
-    public @NotNull Class<? extends ItemType> getReturnType() {
-        return ItemType.class;
+    public @NotNull Class<? extends ItemStack> getReturnType() {
+        return ItemStack.class;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -11,6 +10,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import com.shanebeestudios.skbee.api.util.MathUtil;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 @Examples({"set max stack size component of player's tool to 1",
     "reset max stack size component of player's tool"})
 @Since("3.6.0")
-public class ExprMaxStackSizeComponent extends SimplePropertyExpression<ItemType, Number> {
+public class ExprMaxStackSizeComponent extends SimplePropertyExpression<ItemStack, Number> {
 
     static {
         if (Skript.methodExists(ItemMeta.class, "setMaxStackSize", Integer.class)) {
@@ -32,9 +32,9 @@ public class ExprMaxStackSizeComponent extends SimplePropertyExpression<ItemType
     }
 
     @Override
-    public @Nullable Number convert(ItemType itemType) {
+    public @Nullable Number convert(ItemStack itemType) {
         ItemMeta itemMeta = itemType.getItemMeta();
-        if (!itemMeta.hasMaxStackSize()) return itemType.getMaterial().getMaxStackSize();
+        if (!itemMeta.hasMaxStackSize()) return itemType.getType().getMaxStackSize();
         return itemMeta.getMaxStackSize();
     }
 
@@ -50,7 +50,7 @@ public class ExprMaxStackSizeComponent extends SimplePropertyExpression<ItemType
     @Override
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         Integer maxStackSize = delta != null && delta[0] instanceof Number num ? MathUtil.clamp(num.intValue(), 1, 99) : null;
-        for (ItemType itemType : getExpr().getArray(event)) {
+        for (ItemStack itemType : getExpr().getArray(event)) {
             ItemMeta itemMeta = itemType.getItemMeta();
             itemMeta.setMaxStackSize(maxStackSize);
             itemType.setItemMeta(itemMeta);

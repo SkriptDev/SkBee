@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.nbt.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -11,15 +10,12 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.LiteralUtils;
-import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
 import com.shanebeestudios.skbee.api.nbt.NBTApi;
 import com.shanebeestudios.skbee.api.nbt.NBTCustom;
 import com.shanebeestudios.skbee.api.nbt.NBTCustomBlock;
 import com.shanebeestudios.skbee.api.nbt.NBTCustomEntity;
 import com.shanebeestudios.skbee.api.nbt.NBTCustomItemStack;
-import com.shanebeestudios.skbee.api.nbt.NBTCustomItemType;
-import com.shanebeestudios.skbee.api.nbt.NBTCustomSlot;
 import com.shanebeestudios.skbee.api.nbt.NBTCustomTileEntity;
 import de.tr7zw.changeme.nbtapi.NBTChunk;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
@@ -121,16 +117,9 @@ public class ExprNbtCompound extends PropertyExpression<Object, NBTCompound> {
                 compound = NBTApi.getNBTOfflinePlayer(offlinePlayer);
             } else if (object instanceof Entity entity) {
                 compound = new NBTCustomEntity(entity);
-            } else if (object instanceof ItemType itemType) {
-                if (itemType.getMaterial() == Material.AIR) return null;
-                compound = new NBTCustomItemType(itemType, this.isCustom, this.isVanilla, this.isFullItem);
             } else if (object instanceof ItemStack itemStack) {
                 if (itemStack.getType() == Material.AIR) return null;
                 compound = new NBTCustomItemStack(itemStack, this.isCustom, this.isVanilla, this.isFullItem);
-            } else if (object instanceof Slot slot) {
-                ItemStack stack = slot.getItem();
-                if (stack == null || stack.getType() == Material.AIR) return null;
-                compound = new NBTCustomSlot(slot, this.isCustom, this.isVanilla, this.isFullItem);
             } else if (object instanceof String nbtString) {
                 if (this.isFile) {
                     compound = NBTApi.getNBTFile(nbtString);

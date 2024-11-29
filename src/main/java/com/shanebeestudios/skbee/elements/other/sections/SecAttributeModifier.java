@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.sections;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -24,6 +23,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.EquipmentSlotGroup;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,7 +98,7 @@ public class SecAttributeModifier extends Section {
         }
         VALIDATIOR.addEntryData(new ExpressionEntryData<>("amount", null, false, Number.class));
         VALIDATIOR.addEntryData(new ExpressionEntryData<>("operation", null, false, Operation.class));
-        Skript.registerSection(SecAttributeModifier.class, "apply [:transient] attribute modifier to %itemtypes/livingentities%");
+        Skript.registerSection(SecAttributeModifier.class, "apply [:transient] attribute modifier to %itemstacks/livingentities%");
     }
 
     private boolean trans;
@@ -181,14 +181,14 @@ public class SecAttributeModifier extends Section {
         }
 
         for (Object object : this.objects.getArray(event)) {
-            if (object instanceof ItemType itemType) {
-                ItemMeta itemMeta = itemType.getItemMeta();
+            if (object instanceof ItemStack itemStack) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
 
                 if (!ItemUtils.hasAttributeModifier(itemMeta, attribute, attributeModifier)) {
                     itemMeta.addAttributeModifier(attribute, attributeModifier);
                 }
 
-                itemType.setItemMeta(itemMeta);
+                itemStack.setItemMeta(itemMeta);
             } else if (object instanceof LivingEntity entity) {
                 AttributeInstance attributeInstance = entity.getAttribute(attribute);
                 if (attributeInstance == null) continue;

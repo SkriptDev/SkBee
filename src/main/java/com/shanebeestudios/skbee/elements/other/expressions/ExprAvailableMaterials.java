@@ -1,20 +1,16 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import com.shanebeestudios.skbee.api.particle.ParticleUtil;
-import com.shanebeestudios.skbee.api.util.Util;
 import com.shanebeestudios.skbee.elements.other.type.Types;
 import org.bukkit.EntityEffect;
 import org.bukkit.GameEvent;
@@ -29,7 +25,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
@@ -41,17 +36,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Name("Available Objects")
 @Description({"Get a list of all available objects of a specific type.",
     "SPECIAL TYPES:",
-    "`materials` = All materials as ItemTypes (will be a list of blocks and items).",
-    "`itemtypes` = All item materials as ItemTypes.",
-    "`blocktypes` = All block materials as ItemTypes."})
+    "`materials` = All materials (will be a list of blocks and items).",
+    "`itemtypes` = All materials which can be used as ItemStacks.",
+    "`blocktypes` = All materials which can be used as Blocks."})
 @Examples({"give player random element of all available itemtypes",
     "set {_blocks::*} to all available blocktypes",
     "set target block to random element of all available blockdatas"})
@@ -62,47 +55,26 @@ public class ExprAvailableMaterials extends SimpleExpression<Object> {
     static {
         // Register materials as itemtypes and blockdata
         List<Material> bukkitMaterials = Arrays.asList(Material.values());
-        List<ItemType> materials = new ArrayList<>();
-        List<ItemType> itemTypes = new ArrayList<>();
-        List<ItemType> blockTypes = new ArrayList<>();
+        List<Material> materials = new ArrayList<>();
+        List<Material> itemTypes = new ArrayList<>();
+        List<Material> blockTypes = new ArrayList<>();
         List<BlockData> blockDatas = new ArrayList<>();
 
         bukkitMaterials = bukkitMaterials.stream().sorted(Comparator.comparing(Enum::toString)).toList();
         for (Material material : bukkitMaterials) {
-            ItemType itemType = new ItemType(material);
-            materials.add(itemType);
+            materials.add(material);
             if (material.isItem()) {
-                itemTypes.add(itemType);
+                itemTypes.add(material);
             }
             if (material.isBlock()) {
-                blockTypes.add(itemType);
+                blockTypes.add(material);
                 blockDatas.add(material.createBlockData());
             }
         }
-        Registration.registerList("materials", ItemType.class, materials);
-        Registration.registerList("item[ ]types", ItemType.class, itemTypes);
-        Registration.registerList("block[ ]types", ItemType.class, blockTypes);
+        Registration.registerList("materials", Material.class, materials);
+        Registration.registerList("item[ ]types", Material.class, itemTypes);
+        Registration.registerList("block[ ]types", Material.class, blockTypes);
         Registration.registerList("block[ ]datas", BlockData.class, blockDatas);
-
-
-        // Register entity types
-        // Using a map to prevent adding doubles to a list
-        Map<String, EntityData> entityDataMap = new HashMap<>();
-        for (EntityType entityType : EntityType.values()) {
-            Class<? extends Entity> entityClass = entityType.getEntityClass();
-            if (entityClass == null) {
-                continue;
-            }
-            EntityData<?> entityData = EntityUtils.toSkriptEntityData(entityType);
-            //noinspection ConstantValue
-            if (entityData == null) {
-                Util.debug("Skript is missing EntityType: %s", entityType.getKey());
-                continue;
-            }
-            entityDataMap.put(entityData.toString(), entityData);
-        }
-        List<EntityData> entityDatas = entityDataMap.values().stream().sorted(Comparator.comparing(Object::toString)).collect(Collectors.toList());
-        Registration.registerList("entity[ ]types", EntityData.class, entityDatas);
 
         // Register enums (which don't have a registry)
         List<GameRule> gameRules = Arrays.asList(GameRule.values());
@@ -138,8 +110,8 @@ public class ExprAvailableMaterials extends SimpleExpression<Object> {
             Registration.registerRegistry("damage types", DamageType.class, Registry.DAMAGE_TYPE);
         }
         Registration.registerRegistry("enchantments", Enchantment.class, Registry.ENCHANTMENT);
+        Registration.registerRegistry("entity[ ]types", EntityType.class, Registry.ENTITY_TYPE);
         Registration.registerRegistry("game events", GameEvent.class, Registry.GAME_EVENT);
-        Registration.registerRegistry("minecraft entity[ ]types", EntityType.class, Registry.ENTITY_TYPE);
         Registration.registerRegistry("statistics", Statistic.class, Registry.STATISTIC);
 
         if (Types.HAS_ARMOR_TRIM) {

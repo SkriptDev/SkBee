@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.effects;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -11,6 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,24 +24,25 @@ import org.jetbrains.annotations.NotNull;
 public class EffClearComponent extends Effect {
 
     static {
-        Skript.registerEffect(EffClearComponent.class, "clear (:food|:tool|attribute modifier) component[s] of %itemtypes%");
+        Skript.registerEffect(EffClearComponent.class,
+            "clear (:food|:tool|attribute modifier) component[s] of %itemstacks%");
     }
 
     private int type;
-    private Expression<ItemType> itemTypes;
+    private Expression<ItemStack> itemTypes;
 
     @SuppressWarnings({"NullableProblems", "unchecked"})
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         this.type = parseResult.hasTag("food") ? 0 : parseResult.hasTag("tool") ? 1 : 2;
-        this.itemTypes = (Expression<ItemType>) exprs[0];
+        this.itemTypes = (Expression<ItemStack>) exprs[0];
         return true;
     }
 
     @SuppressWarnings("NullableProblems")
     @Override
     protected void execute(Event event) {
-        for (ItemType itemType : this.itemTypes.getArray(event)) {
+        for (ItemStack itemType : this.itemTypes.getArray(event)) {
             ItemMeta itemMeta = itemType.getItemMeta();
             switch (this.type) {
                 case 0 -> itemMeta.setFood(null);
@@ -59,7 +60,7 @@ public class EffClearComponent extends Effect {
             case 1 -> "tool";
             default -> "attribute modifiers";
         };
-        return "clear " + type + " components of " + this.itemTypes.toString(e,d);
+        return "clear " + type + " components of " + this.itemTypes.toString(e, d);
     }
 
 }

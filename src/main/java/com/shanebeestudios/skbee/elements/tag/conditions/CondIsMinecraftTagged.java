@@ -1,6 +1,5 @@
 package com.shanebeestudios.skbee.elements.tag.conditions;
 
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -9,7 +8,6 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Condition;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.slot.Slot;
 import ch.njol.util.Kleenean;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -18,8 +16,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Name("Minecraft Tag - Is Tagged")
 @Description("Check if an item/block/entity is tagged with a Minecraft Tag.")
@@ -30,8 +28,8 @@ public class CondIsMinecraftTagged extends Condition {
 
     static {
         PropertyCondition.register(CondIsMinecraftTagged.class, PropertyCondition.PropertyType.BE,
-                "tagged (with|as) [minecraft[ ]tag[s]] %minecrafttags%",
-                "itemtypes/slots/itemstacks/blocks/blockdatas/entities");
+            "tagged (with|as) [minecraft[ ]tag[s]] %minecrafttags%",
+            "materials/slots/itemstacks/blocks/blockdatas/entities");
     }
 
     private Expression<Object> objects;
@@ -55,13 +53,8 @@ public class CondIsMinecraftTagged extends Condition {
             } else {
                 Material material = null;
                 if (object instanceof ItemStack itemStack) material = itemStack.getType();
-                else if (object instanceof ItemType itemType) material = itemType.getMaterial();
-                else if (object instanceof Slot slot) {
-                    ItemStack item = slot.getItem();
-                    if (item != null) {
-                        material = item.getType();
-                    }
-                } else if (object instanceof Block block) material = block.getType();
+                else if (object instanceof Material mat) material = mat;
+                else if (object instanceof Block block) material = block.getType();
                 else if (object instanceof BlockData blockData) material = blockData.getMaterial();
 
                 if (material != null) {

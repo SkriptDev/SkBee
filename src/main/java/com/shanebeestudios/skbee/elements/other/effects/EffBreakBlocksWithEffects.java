@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.effects;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -9,7 +8,9 @@ import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
@@ -29,12 +30,12 @@ public class EffBreakBlocksWithEffects extends Effect {
 
     static {
         Skript.registerEffect(EffBreakBlocksWithEffects.class,
-            "break %blocks% [naturally] with effects [exp:[and] with (experience|exp|xp)] [using %-itemtype%]");
+            "break %blocks% [naturally] with effects [exp:[and] with (experience|exp|xp)] [using %-material/itemstack%]");
     }
 
     private boolean exp;
     private Expression<Block> blocks;
-    private Expression<ItemType> itemType;
+    private Expression<?> itemType;
 
     @SuppressWarnings({"NullableProblems", "unchecked"})
     @Override
@@ -45,7 +46,7 @@ public class EffBreakBlocksWithEffects extends Effect {
         }
         this.exp = parseResult.hasTag("exp");
         this.blocks = (Expression<Block>) exprs[0];
-        this.itemType = (Expression<ItemType>) exprs[1];
+        this.itemType = LiteralUtils.defendExpression(exprs[1]);
         return true;
     }
 
@@ -54,8 +55,9 @@ public class EffBreakBlocksWithEffects extends Effect {
     protected void execute(Event event) {
         ItemStack itemStack = null;
         if (this.itemType != null) {
-            ItemType it = this.itemType.getSingle(event);
-            if (it != null) itemStack = it.getRandom();
+            Object it = this.itemType.getSingle(event);
+            if (it instanceof ItemStack is) itemStack = is;
+            else if (it instanceof Material material) itemStack = new ItemStack(material);
         }
 
         for (Block block : this.blocks.getArray(event)) {

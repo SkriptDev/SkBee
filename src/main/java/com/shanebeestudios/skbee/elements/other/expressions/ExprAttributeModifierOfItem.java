@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -20,6 +19,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +48,7 @@ public class ExprAttributeModifierOfItem extends SimpleExpression<AttributeModif
 
     static {
         Skript.registerExpression(ExprAttributeModifierOfItem.class, AttributeModifier.class, ExpressionType.COMBINED,
-            "[:default] [:transient] %attributetype% [attribute] modifier[:s] of %itemtypes/livingentities%");
+            "[:default] [:transient] %attributetype% [attribute] modifier[:s] of %itemstacks/livingentities%");
     }
 
     private boolean single;
@@ -80,10 +80,10 @@ public class ExprAttributeModifierOfItem extends SimpleExpression<AttributeModif
 
         List<AttributeModifier> modifiers = new ArrayList<>();
         for (Object object : this.objects.getArray(event)) {
-            if (object instanceof ItemType itemType) {
-                ItemMeta itemMeta = itemType.getItemMeta();
+            if (object instanceof ItemStack itemStack) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
                 Collection<AttributeModifier> attributeModifiers = this.defaultMods ?
-                    itemType.getMaterial().getDefaultAttributeModifiers().get(attribute) : itemMeta.getAttributeModifiers(attribute);
+                    itemStack.getType().getDefaultAttributeModifiers().get(attribute) : itemMeta.getAttributeModifiers(attribute);
 
                 if (attributeModifiers == null || attributeModifiers.isEmpty()) continue;
 
@@ -136,8 +136,8 @@ public class ExprAttributeModifierOfItem extends SimpleExpression<AttributeModif
         }
 
         for (Object object : this.objects.getArray(event)) {
-            if (object instanceof ItemType itemType) {
-                ItemMeta itemMeta = itemType.getItemMeta();
+            if (object instanceof ItemStack itemStack) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
                 if (mode == ChangeMode.DELETE) {
                     itemMeta.removeAttributeModifier(attribute);
                 } else if (!modifiers.isEmpty()) {
@@ -151,7 +151,7 @@ public class ExprAttributeModifierOfItem extends SimpleExpression<AttributeModif
                         }
                     }
                 }
-                itemType.setItemMeta(itemMeta);
+                itemStack.setItemMeta(itemMeta);
             } else if (object instanceof LivingEntity entity) {
                 AttributeInstance attributeInstance = entity.getAttribute(attribute);
                 if (attributeInstance == null) continue;

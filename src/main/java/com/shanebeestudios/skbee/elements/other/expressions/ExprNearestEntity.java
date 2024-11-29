@@ -2,19 +2,21 @@ package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptConfig;
+import ch.njol.skript.bukkitutil.EntityCategory;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +39,6 @@ import java.util.stream.Collectors;
     "damage 10 nearest entity in radius 10 around player by 2",
     "set {_p} to nearest player around player excluding (all player's where [input doesn't have permission \"some.perm\"])"})
 @Since("2.7.2")
-@SuppressWarnings("NullableProblems")
 public class ExprNearestEntity extends SimpleExpression<Entity> {
 
     private static final int MAX_TARGET_BLOCK_DISTANCE = SkriptConfig.maxTargetBlockDistance.value();
@@ -45,23 +46,23 @@ public class ExprNearestEntity extends SimpleExpression<Entity> {
     static {
         if (Skript.methodExists(World.class, "getNearbyEntitiesByType", Class.class, Location.class, double.class)) {
             Skript.registerExpression(ExprNearestEntity.class, Entity.class, ExpressionType.COMBINED,
-                "[num:%number%] nearest %entitydata% [in radius %-number%] (at|of|around) %location/entity%" +
+                "[num:%number%] nearest %entitytype/entitycategory% [in radius %-number%] (at|of|around) %location/entity%" +
                     " [excluding %-entities%]");
         }
     }
 
     private Expression<Number> number;
-    private Expression<EntityData<?>> entityData;
+    private Expression<?> entityData;
     private Expression<Number> radius;
     private Expression<Object> location;
     private Expression<Entity> excluding;
     private boolean isSingle;
 
-    @SuppressWarnings({"NullableProblems", "unchecked"})
+    @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         this.number = (Expression<Number>) exprs[0];
-        this.entityData = (Expression<EntityData<?>>) exprs[1];
+        this.entityData = LiteralUtils.defendExpression(exprs[1]);
         this.radius = (Expression<Number>) exprs[2];
         this.location = (Expression<Object>) exprs[3];
         this.excluding = (Expression<Entity>) exprs[4];
@@ -72,7 +73,8 @@ public class ExprNearestEntity extends SimpleExpression<Entity> {
     @Override
     protected Entity @Nullable [] get(Event event) {
         Number number = this.number.getSingle(event);
-        EntityData<?> entityData = this.entityData.getSingle(event);
+        Object entityData = this.entityData.getSingle(event);
+
         Number radius = this.radius != null ? this.radius.getSingle(event) : MAX_TARGET_BLOCK_DISTANCE;
         Object object = this.location.getSingle(event);
         if (number == null || entityData == null || radius == null || object == null) return null;
@@ -91,6 +93,7 @@ public class ExprNearestEntity extends SimpleExpression<Entity> {
 
         List<Entity> entities = new ArrayList<>();
         for (int i = 0; i < number.intValue(); i++) {
+            assert nearby != null;
             if (i < nearby.size()) {
                 entities.add(nearby.get(i));
             }
@@ -98,9 +101,17 @@ public class ExprNearestEntity extends SimpleExpression<Entity> {
         return entities.toArray(new Entity[0]);
     }
 
-    private List<Entity> getNearby(Location location, EntityData<?> entityData, double radius, Object self, List<Entity> excluding) {
+    private List<Entity> getNearby(Location location, Object entityData, double radius, Object self, List<Entity> excluding) {
         World world = location.getWorld();
-        return world.getNearbyEntitiesByType(entityData.getType(), location, radius)
+        Class<? extends Entity> entityClass = null;
+        if (entityData instanceof EntityCategory entityCategory) {
+            // TODO need to add a method to EntityCategory to get the class
+        } else if (entityData instanceof EntityType entityType) {
+            entityClass = entityType.getEntityClass();
+        } else {
+            return null;
+        }
+        return world.getNearbyEntitiesByType(entityClass, location, radius)
             .stream()
             .sorted(Comparator.comparing(entity -> entity.getLocation().distanceSquared(location)))
             .filter(entity -> entity != self)

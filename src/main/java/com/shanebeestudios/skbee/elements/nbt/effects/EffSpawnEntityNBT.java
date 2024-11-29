@@ -5,7 +5,6 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -18,28 +17,30 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.Event;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Name("NBT - Spawn Entity with NBT")
 @Description({"Spawn an entity at a location with NBT.",
-        "The ability to spawn falling was added in 2.10.0 as a temp effect until Skript properly handles falling blocks",
-        "with block data."})
+    "The ability to spawn falling was added in 2.10.0 as a temp effect until Skript properly handles falling blocks",
+    "with block data."})
 @Examples({"set {_n} to nbt compound from \"{NoAI:1b}\"",
-        "spawn sheep at player with nbt {_n}",
-        "spawn 1 of zombie at player with nbt nbt compound from \"{NoGravity:1b}\"",
-        "spawn an armor stand at player with nbt from \"{Small:1b,NoBasePlate:1b,Marker:1b}\"",
-        "spawn falling snow[layers=3] at target block with nbt from \"{HurtEntities:1b}\""})
+    "spawn sheep at player with nbt {_n}",
+    "spawn 1 of zombie at player with nbt nbt compound from \"{NoGravity:1b}\"",
+    "spawn an armor stand at player with nbt from \"{Small:1b,NoBasePlate:1b,Marker:1b}\"",
+    "spawn falling snow[layers=3] at target block with nbt from \"{HurtEntities:1b}\""})
 @Since("1.0.0")
 public class EffSpawnEntityNBT extends Effect {
 
     static {
         Skript.registerEffect(EffSpawnEntityNBT.class,
-                "spawn %entitytypes% [%directions% %locations%] with [nbt] %nbtcompound%",
-                "spawn %number% of %entitytypes% [%directions% %locations%] with [nbt] %nbtcompound%",
-                "spawn falling %blockdata% [%directions% %locations%] with [nbt] %nbtcompound%");
+            "spawn %entitytypes% [%directions% %locations%] with [nbt] %nbtcompound%",
+            "spawn %number% of %entitytypes% [%directions% %locations%] with [nbt] %nbtcompound%",
+            "spawn falling %blockdata% [%directions% %locations%] with [nbt] %nbtcompound%");
     }
 
     @SuppressWarnings("null")
@@ -80,18 +81,21 @@ public class EffSpawnEntityNBT extends Effect {
 
         for (final Location loc : this.locations.getArray(event)) {
             assert loc != null : this.locations;
+            World world = loc.getWorld();
+            if (world == null) continue;
+
             if (this.entityTypes != null) {
                 for (final EntityType entityType : this.entityTypes.getArray(event)) {
-                    for (int i = 0; i < amount * entityType.getAmount(); i++) {
-                        Entity spawn = entityType.data.spawn(loc, entity -> NBTApi.addNBTToEntity(entity, compound));
+                    for (int i = 0; i < amount; i++) {
+                        Entity spawn = world.spawnEntity(loc, entityType, SpawnReason.CUSTOM, entity -> NBTApi.addNBTToEntity(entity, compound));
                         SkriptUtils.setLastSpawned(spawn);
                     }
+
                 }
             } else if (this.blockdata != null) {
                 BlockData blockData = this.blockdata.getSingle(event);
                 if (blockData == null) return;
 
-                World world = loc.getWorld();
                 FallingBlock fallingBlock = world.spawnFallingBlock(loc, blockData);
                 NBTApi.addNBTToEntity(fallingBlock, compound);
                 SkriptUtils.setLastSpawned(fallingBlock);
@@ -101,13 +105,13 @@ public class EffSpawnEntityNBT extends Effect {
 
     @Override
     public @NotNull String toString(Event e, boolean d) {
-        String locAndNBT = " " + this.locations.toString(e,d) + " " + this.nbt.toString(e,d);
+        String locAndNBT = " " + this.locations.toString(e, d) + " " + this.nbt.toString(e, d);
         if (this.blockdata != null) {
-            return "spawn falling " + this.blockdata.toString(e,d) + locAndNBT;
+            return "spawn falling " + this.blockdata.toString(e, d) + locAndNBT;
         } else {
             assert this.entityTypes != null;
             return "spawn " + (this.amount != null ? this.amount.toString(e, d) + " " : "") +
-                    this.entityTypes.toString(e, d) + locAndNBT;
+                this.entityTypes.toString(e, d) + locAndNBT;
         }
     }
 

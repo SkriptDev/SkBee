@@ -1,9 +1,7 @@
 package com.shanebeestudios.skbee.api.recipe;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.slot.Slot;
 import com.shanebeestudios.skbee.api.util.Util;
 import com.shanebeestudios.skbee.elements.recipe.sections.SecRecipeSmithing;
 import io.papermc.paper.potion.PotionMix;
@@ -42,7 +40,10 @@ public class RecipeUtil {
      */
     @Nullable
     public static RecipeChoice getRecipeChoice(Object object) {
-        if (object instanceof ItemStack itemStack) {
+        if (object instanceof Material material) {
+            if (!material.isItem() || material.isAir()) return null;
+            return new MaterialChoice(material);
+        } else if (object instanceof ItemStack itemStack) {
             Material material = itemStack.getType();
             if (!material.isItem() || material.isAir()) return null;
 
@@ -51,10 +52,6 @@ public class RecipeUtil {
             } else {
                 return new ExactChoice(itemStack);
             }
-        } else if (object instanceof Slot slot) {
-            return getRecipeChoice(slot.getItem());
-        } else if (object instanceof ItemType itemType) {
-            return getRecipeChoice(itemType.getRandom());
         } else if (object instanceof RecipeChoice choice) {
             return choice;
         }
@@ -113,7 +110,7 @@ public class RecipeUtil {
         if (HAS_CATEGORY) {
             log(" - &7Category: &r\"&6%s&r\"", recipe.getCategory());
         }
-        log(" - &7CookTime: &b%s", Timespan.fromTicks(recipe.getCookingTime()));
+        log(" - &7CookTime: &b%s", new Timespan(Timespan.TimePeriod.TICK, recipe.getCookingTime()));
         log(" - &7Experience: &b%s", recipe.getExperience());
         log(" - &7Ingredients: %s", getFancy(recipe.getInputChoice()));
     }

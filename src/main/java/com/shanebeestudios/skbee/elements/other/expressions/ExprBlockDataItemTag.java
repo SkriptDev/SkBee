@@ -1,6 +1,5 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -15,6 +14,7 @@ import com.shanebeestudios.skbee.api.util.BlockDataUtils;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,11 +23,11 @@ import org.jetbrains.annotations.Nullable;
 @Description("Get/set the value of a tag in the BlockData of an item.")
 @Examples("")
 @Since("3.4.0")
-public class ExprBlockDataItemTag extends PropertyExpression<ItemType, Object> {
+public class ExprBlockDataItemTag extends PropertyExpression<ItemStack, Object> {
 
     static {
         PropertyExpression.register(ExprBlockDataItemTag.class, Object.class,
-                "item [block[ ]](data|state) tag %string%", "itemtypes");
+            "item [block[ ]](data|state) tag %string%", "itemstacks");
     }
 
     private Expression<String> tag;
@@ -36,17 +36,17 @@ public class ExprBlockDataItemTag extends PropertyExpression<ItemType, Object> {
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         this.tag = (Expression<String>) exprs[matchedPattern];
-        setExpr((Expression<ItemType>) exprs[1 - matchedPattern]);
+        setExpr((Expression<ItemStack>) exprs[1 - matchedPattern]);
         return true;
     }
 
     @SuppressWarnings("NullableProblems")
     @Override
-    protected Object[] get(Event event, ItemType[] source) {
+    protected Object[] get(Event event, ItemStack[] source) {
         return get(source, itemType -> {
             if (!(itemType.getItemMeta() instanceof BlockDataMeta meta)) return null;
 
-            Material blockForm = BlockDataUtils.getBlockForm(itemType.getMaterial());
+            Material blockForm = BlockDataUtils.getBlockForm(itemType.getType());
             if (!blockForm.isBlock()) return null;
 
             BlockData blockData = meta.getBlockData(blockForm);
@@ -66,8 +66,8 @@ public class ExprBlockDataItemTag extends PropertyExpression<ItemType, Object> {
     @Override
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         if (delta == null) return;
-        for (ItemType itemType : getExpr().getAll(event)) {
-            Material blockForm = BlockDataUtils.getBlockForm(itemType.getMaterial());
+        for (ItemStack itemType : getExpr().getAll(event)) {
+            Material blockForm = BlockDataUtils.getBlockForm(itemType.getType());
             BlockDataMeta itemMeta = (BlockDataMeta) itemType.getItemMeta();
             BlockData oldBlockData;
             if (itemMeta.hasBlockData()) {

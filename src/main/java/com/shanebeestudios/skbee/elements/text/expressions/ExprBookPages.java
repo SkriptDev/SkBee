@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.text.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -16,6 +15,7 @@ import ch.njol.util.coll.CollectionUtils;
 import com.shanebeestudios.skbee.api.wrapper.ComponentWrapper;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,16 +36,16 @@ public class ExprBookPages extends SimpleExpression<ComponentWrapper> {
 
     static {
         Skript.registerExpression(ExprBookPages.class, ComponentWrapper.class, ExpressionType.PROPERTY,
-                "page %number% of [book] %itemtype%");
+                "page %number% of [book] %itemstacks%");
     }
 
-    private Expression<ItemType> item;
+    private Expression<ItemStack> item;
     private Expression<Number> page;
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?> @NotNull [] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parseResult) {
-        this.item = (Expression<ItemType>) exprs[1];
+        this.item = (Expression<ItemStack>) exprs[1];
         this.page = (Expression<Number>) exprs[0];
         return true;
     }
@@ -53,10 +53,10 @@ public class ExprBookPages extends SimpleExpression<ComponentWrapper> {
     @SuppressWarnings("NullableProblems")
     @Override
     protected ComponentWrapper @Nullable [] get(@NotNull Event event) {
-        ItemType item = this.item.getSingle(event);
+        ItemStack item = this.item.getSingle(event);
         if (item == null) return null;
 
-        if (item.getMaterial() == Material.WRITTEN_BOOK) {
+        if (item.getType() == Material.WRITTEN_BOOK) {
             BookMeta bookMeta = ((BookMeta) item.getItemMeta());
             Number num = this.page.getSingle(event);
             int page = num == null ? 0 : num.intValue();
@@ -82,14 +82,14 @@ public class ExprBookPages extends SimpleExpression<ComponentWrapper> {
     @Override
     public void change(@NotNull Event e, @Nullable Object[] delta, @NotNull ChangeMode mode) {
         ComponentWrapper[] componentWrappers = delta == null ? null : (ComponentWrapper[]) delta;
-        ItemType book = this.item.getSingle(e);
+        ItemStack book = this.item.getSingle(e);
         if (book == null) return;
 
-        Material bookMaterial = book.getMaterial();
+        Material bookMaterial = book.getType();
 
         ComponentWrapper comp = ComponentWrapper.fromComponents(componentWrappers);
 
-        if (book.getMaterial() == Material.WRITTEN_BOOK) {
+        if (book.getType() == Material.WRITTEN_BOOK) {
             BookMeta bookMeta = ((BookMeta) book.getItemMeta());
 
             Number pageNumber = this.page.getSingle(e);

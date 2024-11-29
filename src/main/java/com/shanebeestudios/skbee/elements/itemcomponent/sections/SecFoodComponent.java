@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.sections;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -87,18 +86,18 @@ public class SecFoodComponent extends Section {
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("saturation", null, false, Number.class));
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("can always eat", null, true, Boolean.class));
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("eat time", null, true, Timespan.class));
-            VALIDATIOR.addEntryData(new ExpressionEntryData<>("using converts to", null, true, ItemType.class));
+            VALIDATIOR.addEntryData(new ExpressionEntryData<>("using converts to", null, true, ItemStack.class));
             VALIDATIOR.addSection("effects", true);
-            Skript.registerSection(SecFoodComponent.class, "apply food component to %itemtypes%");
+            Skript.registerSection(SecFoodComponent.class, "apply food component to %itemstacks%");
         }
     }
 
-    private Expression<ItemType> items;
+    private Expression<ItemStack> items;
     private Expression<Number> nutrition;
     private Expression<Number> saturation;
     private Expression<Boolean> canAlwaysEat;
     private Expression<Timespan> eatTime;
-    private Expression<ItemType> usingConverts;
+    private Expression<ItemStack> usingConverts;
     private Trigger potionEffectSection;
 
     @SuppressWarnings({"NullableProblems", "unchecked"})
@@ -107,12 +106,12 @@ public class SecFoodComponent extends Section {
         EntryContainer container = VALIDATIOR.build().validate(sectionNode);
         if (container == null) return false;
 
-        this.items = (Expression<ItemType>) exprs[0];
+        this.items = (Expression<ItemStack>) exprs[0];
         this.nutrition = (Expression<Number>) container.getOptional("nutrition", false);
         this.saturation = (Expression<Number>) container.getOptional("saturation", false);
         this.canAlwaysEat = (Expression<Boolean>) container.getOptional("can always eat", false);
         this.eatTime = (Expression<Timespan>) container.getOptional("eat time", false);
-        this.usingConverts = (Expression<ItemType>) container.getOptional("using converts to", false);
+        this.usingConverts = (Expression<ItemStack>) container.getOptional("using converts to", false);
         if (this.usingConverts != null && !HAS_CONVERT) {
             Skript.error("'using converts to' requires Minecraft 1.21+");
             return false;
@@ -138,16 +137,16 @@ public class SecFoodComponent extends Section {
 
         boolean canAlwaysEat = this.canAlwaysEat != null ? this.canAlwaysEat.getSingle(event) : false;
         Timespan eatTime = this.eatTime != null ? this.eatTime.getSingle(event) : null;
-        ItemStack usingConvertsTo = this.usingConverts != null ? this.usingConverts.getSingle(event).getRandom() : null;
+        ItemStack usingConvertsTo = this.usingConverts != null ? this.usingConverts.getSingle(event) : null;
 
-        for (ItemType itemType : this.items.getArray(event)) {
+        for (ItemStack itemType : this.items.getArray(event)) {
             ItemMeta itemMeta = itemType.getItemMeta();
 
             FoodComponent food = itemMeta.getFood();
             food.setNutrition(nutrition);
             food.setSaturation(saturation);
             food.setCanAlwaysEat(canAlwaysEat);
-            if (eatTime != null) food.setEatSeconds((float) eatTime.getTicks() / 20);
+            if (eatTime != null) food.setEatSeconds((float) eatTime.getAs(Timespan.TimePeriod.TICK) / 20);
             if (HAS_CONVERT && usingConvertsTo != null) {
                 food.setUsingConvertsTo(usingConvertsTo);
             }
