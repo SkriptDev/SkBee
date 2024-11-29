@@ -22,7 +22,7 @@ test "SkBee - simple nbt compound":
     delete random entity of {_e}
     delete {_n}
 
-    set {_i} to diamond sword with custom model data 1
+    set {_i} to itemstack of diamond sword with custom model data 1
     set {_n} to nbt of {_i}
 
     # Test that tag of item nbt is set

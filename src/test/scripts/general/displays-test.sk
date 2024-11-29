@@ -14,7 +14,7 @@ test "SkBee - display entities":
     set {_e} to last spawned entity
 
     # Test that blockdata is set correctly
-    assert display blockdata of {_e} = stone[] with "BlockData of BlockDisplay should be stone[]"
+    assert blockdata of {_e} = stone[] with "BlockData of BlockDisplay should be stone[]"
 
     # Test for ItemDisplay
     spawn item display at location(1,1,1):
@@ -22,7 +22,7 @@ test "SkBee - display entities":
     set {_e} to last spawned entity
 
     # Test that item is set correctly
-    assert display item of {_e} = diamond sword with "Item of ItemDisplay should be diamond sword"
+    assert material of item of {_e} = diamond sword with "Item of ItemDisplay should be diamond sword"
 
     # Test random other stuff to make sure no errors
     set display right rotation of {_e} to quaternion(0,0,0,1)
