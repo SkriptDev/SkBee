@@ -10,7 +10,7 @@ test "SkBee - display entities":
 
     # Test for BlockDisplay
     spawn block display at location(1,1,1):
-        set display blockdata of entity to stone[]
+        set blockdata of entity to stone[]
     set {_e} to last spawned entity
 
     # Test that blockdata is set correctly
@@ -18,7 +18,7 @@ test "SkBee - display entities":
 
     # Test for ItemDisplay
     spawn item display at location(1,1,1):
-        set display item of entity to diamond sword
+        set item of entity to itemstack of diamond sword
     set {_e} to last spawned entity
 
     # Test that item is set correctly
