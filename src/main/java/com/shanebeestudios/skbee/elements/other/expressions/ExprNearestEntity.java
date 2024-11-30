@@ -103,9 +103,9 @@ public class ExprNearestEntity extends SimpleExpression<Entity> {
 
     private List<Entity> getNearby(Location location, Object entityData, double radius, Object self, List<Entity> excluding) {
         World world = location.getWorld();
-        Class<? extends Entity> entityClass = null;
+        Class<? extends Entity> entityClass;
         if (entityData instanceof EntityCategory entityCategory) {
-            // TODO need to add a method to EntityCategory to get the class
+            entityClass = entityCategory.getEntityClass();
         } else if (entityData instanceof EntityType entityType) {
             entityClass = entityType.getEntityClass();
         } else {

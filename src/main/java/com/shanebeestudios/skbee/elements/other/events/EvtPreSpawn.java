@@ -1,6 +1,7 @@
 package com.shanebeestudios.skbee.elements.other.events;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.bukkitutil.EntityCategory;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -120,8 +121,7 @@ public class EvtPreSpawn extends SkriptEvent {
 
             return this.spawnedEntities.check(event, entityData -> {
                 if (entityData instanceof EntityType et && entityType == et) return true;
-                // TODO EntityCategory needs an option for comparing super classes to EntityType
-                return false;
+                return entityData instanceof EntityCategory ec && ec.isOfType(entityType);
             });
         }
         return false;

@@ -25,21 +25,21 @@ import java.util.List;
 @Name("Bound - Entities")
 @Description("Get all the entities within a bound. NOTE: If the chunk in a bound is unloaded, entities will also be unloaded.")
 @Examples({"set {_b} to bound with id \"my-bound\"",
-        "loop entities in bound {_b}:",
-        "\tif loop-entity is a cow or pig:",
-        "\t\tkill loop-entity"})
+    "loop entities in bound {_b}:",
+    "\tif loop-entity is a cow or pig:",
+    "\t\tkill loop-entity"})
 @Since("1.15.0")
 public class ExprBoundEntities extends SimpleExpression<Entity> {
 
     static {
         Skript.registerExpression(ExprBoundEntities.class, Entity.class, ExpressionType.SIMPLE,
-                "[(all [[of] the]|the)] %*entitytypes/entitycategories% (of|in|within) bound[s] %bounds%");
+            "[(all [[of] the]|the)] %*entitytypes/entitycategories% (of|in|within) bound[s] %bounds%");
     }
 
     private Expression<?> entityDatas;
     private Expression<Bound> bounds;
 
-    @SuppressWarnings({"unchecked", "NullableProblems"})
+    @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         entityDatas = LiteralUtils.defendExpression(exprs[0]);
@@ -47,7 +47,6 @@ public class ExprBoundEntities extends SimpleExpression<Entity> {
         return true;
     }
 
-    @SuppressWarnings("NullableProblems")
     @Nullable
     @Override
     protected Entity[] get(Event event) {
@@ -57,9 +56,8 @@ public class ExprBoundEntities extends SimpleExpression<Entity> {
                 List<Entity> boundEntities = new ArrayList<>();
                 if (entityData instanceof EntityType entityType) {
                     boundEntities = bound.getEntities(entityType.getEntityClass());
-
                 } else if (entityData instanceof EntityCategory entityCategory) {
-                    // TODO EC needs method to get class
+                    boundEntities = bound.getEntities(entityCategory.getEntityClass());
                 }
                 if (boundEntities != null) entities.addAll(boundEntities);
             }
