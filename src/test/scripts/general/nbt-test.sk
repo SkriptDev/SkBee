@@ -64,5 +64,5 @@ test "SkBee - NBTCustomBlock":
 test "SkBee - NBT Item":
     # Paper ItemStack issue causing error before, hopefully fixed now
     set {_i} to itemstack of diamond sword
-    send pretty nbt of vanilla nbt of {_i} with split "  "
-    send pretty nbt of vanilla nbt of itemstack of diamond axe with split "  "
+    assert pretty nbt of vanilla nbt of {_i} with split "  " is set with "Pretty nbt of item should be set"
+    assert pretty nbt of vanilla nbt of itemstack of diamond axe with split "  "  is set with "Pretty nbt of item should be set"
