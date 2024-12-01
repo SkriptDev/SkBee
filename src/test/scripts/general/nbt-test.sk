@@ -60,3 +60,9 @@ test "SkBee - NBTCustomBlock":
     assert size of nbt tags of nbt of block at {_l} = 0 with "size of nbt tags of block should be 0"
 
     assert size of nbt tags of nbt of chunk at {_l} = 0 with "size of nbt tags of chunk should be 0"
+
+test "SkBee - NBT Item":
+    # Paper ItemStack issue causing error before, hopefully fixed now
+    set {_i} to itemstack of diamond sword
+    send pretty nbt of vanilla nbt of {_i} with split "  "
+    send pretty nbt of vanilla nbt of itemstack of diamond axe with split "  "
