@@ -79,7 +79,8 @@ public class NBTReflection {
     @SuppressWarnings({"deprecation"})
     public static NBTCompound getVanillaNBT(ItemStack itemStack) {
         try {
-            Object nmsItem = ReflectionUtils.getField("handle", CRAFT_ITEM_STACK_CLASS, itemStack);
+            Object cbStack = ReflectionUtils.getField("craftDelegate", ItemStack.class, itemStack);
+            Object nmsItem = ReflectionUtils.getField("handle", CRAFT_ITEM_STACK_CLASS, cbStack);
             Object components = GET_COMPONENTS_METHOD.invoke(nmsItem);
             Object serial = CREATE_SERIALIZER_METHOD.invoke(REGISTERY_ACCESS, NBT_OPS_INSTANCE);
             Object newNBTCompound = NBT_COMPOUND_CONSTRUCTOR.newInstance();
