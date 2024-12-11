@@ -31,7 +31,7 @@ repositories {
 
 dependencies {
     // Paper
-    compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
     // Skript
     compileOnly(group: 'com.github.SkriptDev', name: 'Skript', version: '3.0.0-Beta3') {
@@ -43,7 +43,7 @@ dependencies {
     compileOnly("org.apache.commons:commons-text:1.10.0")
 
     // NBT-API
-    implementation("de.tr7zw:item-nbt-api:2.14.0") {
+    implementation("de.tr7zw:item-nbt-api:2.14.1-SNAPSHOT") {
         transitive = false
     }
 
@@ -92,7 +92,7 @@ shadowJar {
 tasks.register('server', Copy) {
     from shadowJar
     // Change this to wherever you want your jar to build
-    into '/Users/ShaneBee/Desktop/Server/Skript/1-21-2-no-it/plugins'
+    into '/Users/ShaneBee/Desktop/Server/SkriptThree/1-21-4/plugins'
 }
 
 publishing {
