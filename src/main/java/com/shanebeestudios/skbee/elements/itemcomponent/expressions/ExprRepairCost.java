@@ -7,13 +7,13 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.Repairable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("UnstableApiUsage")
 @Name("ItemComponent - Repair Cost")
 @Description({"The number of experience levels to add to the base level cost when repairing, combining, or renaming this item with an anvil.",
     "Must be a non-negative integer, defaults to 0."})
@@ -31,14 +31,9 @@ public class ExprRepairCost extends SimplePropertyExpression<ItemStack, Number> 
 
     @Override
     public @Nullable Number convert(ItemStack itemType) {
-        ItemMeta itemMeta = itemType.getItemMeta();
-        if (itemMeta instanceof Repairable repairable) {
-            return repairable.getRepairCost();
-        }
-        return null;
+        return itemType.getData(DataComponentTypes.REPAIR_COST);
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
         if (mode == ChangeMode.SET || mode == ChangeMode.REMOVE || mode == ChangeMode.ADD)
@@ -47,20 +42,27 @@ public class ExprRepairCost extends SimplePropertyExpression<ItemStack, Number> 
         return null;
     }
 
-    @SuppressWarnings({"NullableProblems", "ConstantValue"})
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         int cost = delta != null && delta[0] instanceof Number num ? num.intValue() : 0;
-        for (ItemStack itemType : getExpr().getArray(event)) {
-            ItemMeta itemMeta = itemType.getItemMeta();
-            if (itemMeta instanceof Repairable repairable) {
+
+        for (ItemStack itemStack : getExpr().getArray(event)) {
+            if (mode == ChangeMode.DELETE) {
+                itemStack.unsetData(DataComponentTypes.REPAIR_COST);
+            } else if (mode == ChangeMode.RESET) {
+                itemStack.resetData(DataComponentTypes.REPAIR_COST);
+            } else {
+                int previousCost = 0;
+                if (itemStack.hasData(DataComponentTypes.REPAIR_COST)) {
+                    previousCost = itemStack.getData(DataComponentTypes.REPAIR_COST);
+                }
                 int newCost = switch (mode) {
-                    case ADD -> repairable.getRepairCost() + cost;
-                    case REMOVE -> repairable.getRepairCost() - cost;
+                    case ADD -> previousCost + cost;
+                    case REMOVE -> previousCost - cost;
                     default -> cost;
                 };
-                repairable.setRepairCost(Math.max(newCost, 0));
-                itemType.setItemMeta(itemMeta);
+                itemStack.setData(DataComponentTypes.REPAIR_COST, Math.max(newCost, 0));
             }
         }
     }

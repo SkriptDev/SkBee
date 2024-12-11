@@ -12,10 +12,18 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.util.Kleenean;
 import com.shanebeestudios.skbee.elements.itemcomponent.sections.SecToolComponent.ToolComponentApplyRulesEvent;
+import io.papermc.paper.datacomponent.item.Tool;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
+import io.papermc.paper.registry.set.RegistryKeySet;
+import io.papermc.paper.registry.set.RegistrySet;
+import io.papermc.paper.registry.tag.TagKey;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.Tag;
+import org.bukkit.block.BlockType;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.meta.components.ToolComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
@@ -25,7 +33,7 @@ import org.skriptlang.skript.lang.entry.util.ExpressionEntryData;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("DataFlowIssue")
+@SuppressWarnings("UnstableApiUsage")
 @Name("ItemComponent - Tool Rule Apply")
 @Description({"Apply rules to a tool component. You can add as many as you'd like.",
     "See [**McWiki Tool Component**](https://minecraft.wiki/w/Data_component_format#tool) for more details.",
@@ -54,14 +62,14 @@ import java.util.List;
 @Since("3.5.8")
 public class SecToolRule extends Section {
 
-    private static final EntryValidator.EntryValidatorBuilder VALIDATIOR = EntryValidator.builder();
+    private static final EntryValidator.EntryValidatorBuilder VALIDATOR = EntryValidator.builder();
 
     static {
         if (Skript.classExists("org.bukkit.inventory.meta.components.ToolComponent")) {
-            VALIDATIOR.addEntryData(new ExpressionEntryData<>("block types", null, true, Material.class));
-            VALIDATIOR.addEntryData(new ExpressionEntryData<>("block tag", null, true, Tag.class));
-            VALIDATIOR.addEntryData(new ExpressionEntryData<>("speed", null, true, Number.class));
-            VALIDATIOR.addEntryData(new ExpressionEntryData<>("correct for drops", null, true, Boolean.class));
+            VALIDATOR.addEntryData(new ExpressionEntryData<>("block types", null, true, Material.class));
+            VALIDATOR.addEntryData(new ExpressionEntryData<>("block tag", null, true, Tag.class));
+            VALIDATOR.addEntryData(new ExpressionEntryData<>("speed", null, true, Number.class));
+            VALIDATOR.addEntryData(new ExpressionEntryData<>("correct for drops", null, true, Boolean.class));
             Skript.registerSection(SecToolRule.class, "apply tool rule");
         }
     }
@@ -71,7 +79,7 @@ public class SecToolRule extends Section {
     private Expression<Number> speed;
     private Expression<Boolean> correctForDrops;
 
-    @SuppressWarnings({"NullableProblems", "unchecked"})
+    @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
         if (!getParser().isCurrentEvent(ToolComponentApplyRulesEvent.class)) {
@@ -79,7 +87,7 @@ public class SecToolRule extends Section {
             return false;
         }
 
-        EntryContainer container = VALIDATIOR.build().validate(sectionNode);
+        EntryContainer container = VALIDATOR.build().validate(sectionNode);
         if (container == null) return false;
 
         this.blockTypes = (Expression<Material>) container.getOptional("block types", false);
@@ -97,23 +105,33 @@ public class SecToolRule extends Section {
     @Override
     protected @Nullable TriggerItem walk(Event event) {
         if (event instanceof ToolComponentApplyRulesEvent rulesEvent) {
-            ToolComponent component = rulesEvent.getComponent();
+            Tool.Builder toolBuilder = rulesEvent.getToolBuilder();
 
             Number speedNum = this.speed != null ? this.speed.getSingle(event) : null;
             Float speed = speedNum != null ? speedNum.floatValue() : null;
             if (speed != null && speed <= 0) speed = null;
-            Boolean correctForDrops = this.correctForDrops != null ? this.correctForDrops.getSingle(event) : null;
+            Boolean aBoolean = this.correctForDrops != null ? this.correctForDrops.getSingle(event) : null;
+            TriState correctForDrops = aBoolean != null ? TriState.valueOf(aBoolean.toString()) : TriState.NOT_SET;
 
             if (this.blockTypes != null) {
-                List<Material> blockMaterials = new ArrayList<>();
+                List<TypedKey<BlockType>> blockKeys = new ArrayList<>();
                 for (Material material : this.blockTypes.getArray(event)) {
-                    if (material.isBlock()) blockMaterials.add(material);
+                    if (material.isBlock()) {
+                        TypedKey<BlockType> key = TypedKey.create(RegistryKey.BLOCK, material.key());
+                        blockKeys.add(key);
+                    }
                 }
-                component.addRule(blockMaterials, speed, correctForDrops);
+
+                RegistryKeySet<BlockType> keys = RegistrySet.keySet(RegistryKey.BLOCK, blockKeys);
+                toolBuilder.addRule(Tool.rule(keys, speed, correctForDrops));
+
             } else if (this.blockKey != null) {
-                Tag<Material> tag = this.blockKey.getSingle(event);
-                if (tag != null) {
-                    component.addRule(tag, speed, correctForDrops);
+                Tag<Material> bukkitTag = this.blockKey.getSingle(event);
+                if (bukkitTag != null) {
+                    TagKey<BlockType> tagKey = TagKey.create(RegistryKey.BLOCK, bukkitTag.key());
+                    io.papermc.paper.registry.tag.Tag<BlockType> tag = Registry.BLOCK.getTag(tagKey);
+                    Tool.Rule rule = Tool.rule(tag, speed, correctForDrops);
+                    toolBuilder.addRule(rule);
                 }
             }
         }
@@ -124,4 +142,5 @@ public class SecToolRule extends Section {
     public @NotNull String toString(Event e, boolean d) {
         return "apply tool rule";
     }
+
 }
