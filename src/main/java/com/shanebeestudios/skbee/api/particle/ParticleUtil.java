@@ -35,8 +35,8 @@ public class ParticleUtil {
 
     private static final Map<String, Particle> PARTICLES = new HashMap<>();
     private static final Map<Particle, String> PARTICLE_NAMES = new HashMap<>();
-    // Added in Minecraft 1.21.2
-    public static final boolean HAS_TARGET_COLOR = Skript.classExists("org.bukkit.Particle$TargetColor");
+    // Added in Minecraft 1.21.4
+    public static final boolean HAS_TRAIL = Skript.classExists("org.bukkit.Particle$Trail");
 
     static {
         Registry.PARTICLE_TYPE.forEach(particle -> {
@@ -117,8 +117,8 @@ public class ParticleUtil {
             return "number(float)";
         } else if (dataType == Color.class) {
             return "color/bukkitcolor";
-        } else if (HAS_TARGET_COLOR && dataType == Particle.TargetColor.class) {
-            return "targetColor";
+        } else if (HAS_TRAIL && dataType == Particle.Trail.class) {
+            return "trail";
         }
         // For future particle data additions that haven't been added here yet
         Util.debug("Missing particle data type: '&e" + dataType.getName() + "&7'");
@@ -175,7 +175,7 @@ public class ParticleUtil {
                     return material.createBlockData();
                 }
             }
-        } else if (HAS_TARGET_COLOR && dataType == Particle.TargetColor.class && data instanceof Particle.TargetColor) {
+        } else if (HAS_TRAIL && dataType == Particle.Trail.class && data instanceof Particle.Trail) {
             return data;
         }
         return null;

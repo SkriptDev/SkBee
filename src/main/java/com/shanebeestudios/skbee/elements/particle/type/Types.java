@@ -11,6 +11,7 @@ import ch.njol.skript.registrations.DefaultClasses;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.SkriptColor;
 import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import com.shanebeestudios.skbee.api.particle.ParticleUtil;
 import com.shanebeestudios.skbee.api.util.SkriptUtils;
 import com.shanebeestudios.skbee.api.util.Util;
@@ -99,10 +100,10 @@ public class Types {
             .parser(SkriptUtils.getDefaultParser()));
 
         //noinspection UnstableApiUsage
-        if (ParticleUtil.HAS_TARGET_COLOR && Classes.getExactClassInfo(Particle.TargetColor.class) == null) {
-            Classes.registerClass(new ClassInfo<>(Particle.TargetColor.class, "targetcolor")
+        if (ParticleUtil.HAS_TRAIL && Classes.getExactClassInfo(Particle.Trail.class) == null) {
+            Classes.registerClass(new ClassInfo<>(Particle.Trail.class, "trail")
                 .name(ClassInfo.NO_DOC)
-                .user("target ?colors?")
+                .user("trails?")
                 .parser(SkriptUtils.getDefaultParser()));
         }
 
@@ -172,22 +173,24 @@ public class Types {
             .examples("set {_v} to vibration({loc}, 10 seconds)")
             .since("1.11.1"));
 
-        if (ParticleUtil.HAS_TARGET_COLOR) {
+        if (ParticleUtil.HAS_TRAIL) {
             //noinspection DataFlowIssue
-            Functions.registerFunction(new SimpleJavaFunction<>("targetColor", new Parameter[]{
+            Functions.registerFunction(new SimpleJavaFunction<>("trail", new Parameter[]{
                     new Parameter<>("target", DefaultClasses.LOCATION, true, null),
-                    new Parameter<>("color", DefaultClasses.COLOR, true, null)
-                }, Classes.getExactClassInfo(Particle.TargetColor.class), true) {
+                    new Parameter<>("color", DefaultClasses.COLOR, true, null),
+                    new Parameter<>("duration", DefaultClasses.TIMESPAN, true, null)
+                }, Classes.getExactClassInfo(Particle.Trail.class), true) {
                     @Override
-                    public Particle.TargetColor[] executeSimple(Object[][] params) {
+                    public Particle.Trail[] executeSimple(Object[][] params) {
                         Location target = (Location) params[0][0];
                         org.bukkit.Color color = ((Color) params[1][0]).asBukkitColor();
-                        return new Particle.TargetColor[]{new Particle.TargetColor(target, color)};
+                        Timespan duration = (Timespan) params[2][0];
+                        return new Particle.Trail[]{new Particle.Trail(target, color, (int) duration.getAs(TimePeriod.TICK))};
                     }
-                }).description("Creates a new target color to be used with 'trail' particle.",
-                    "Takes in a location for the target (where the trail heads to) and the color.",
-                    "Requires Minecraft 1.21.2+")
-                .examples("set {_target} to targetColor(location of target block, blue)",
+                }).description("Creates a new trail to be used with 'trail' particle.",
+                    "Takes in a location for the target (where the trail heads to), color and duration.",
+                    "Requires Minecraft 1.21.4+")
+                .examples("set {_target} to trail(location of target block, blue, 10 seconds)",
                     "make 10 of trail using {_target} at location of player")
                 .since("3.6.2");
         }
