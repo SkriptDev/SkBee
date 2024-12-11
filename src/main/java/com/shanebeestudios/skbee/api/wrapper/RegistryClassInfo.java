@@ -19,6 +19,7 @@ import org.skriptlang.skript.lang.comparator.Relation;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -100,7 +101,7 @@ public class RegistryClassInfo<T extends Keyed> extends ClassInfo<T> {
         this.suffix = suffix;
         Comparators.registerComparator(registryClass, registryClass, (o1, o2) -> Relation.get(o1.equals(o2)));
         if (usage) this.usage(getNames());
-        this.supplier(registry::iterator);
+        this.supplier(() -> registry.stream().sorted(Comparator.comparing(o -> o.getKey().toString())).iterator());
         this.parser(new Parser<>() {
             @Override
             public @Nullable T parse(String string, ParseContext context) {
