@@ -11,6 +11,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import com.shanebeestudios.skbee.api.recipe.RecipeUtil;
+import com.shanebeestudios.skbee.elements.tag.type.Types;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.event.Event;
@@ -33,8 +34,9 @@ import java.util.List;
 @Since("1.10.0")
 public class ExprMaterialChoice extends SimpleExpression<MaterialChoice> {
     static {
+        String pattern = Types.HAS_TAG ? "%materials/minecrafttags%" : "%materials%";
         Skript.registerExpression(ExprMaterialChoice.class, MaterialChoice.class, ExpressionType.COMBINED,
-            "material choice of %materials/minecrafttags%");
+            "material choice of " + pattern);
     }
 
     private Expression<?> objects;
