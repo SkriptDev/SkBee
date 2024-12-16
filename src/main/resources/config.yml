@@ -55,9 +55,6 @@ elements:
     # Enable NBT elements
     nbt: true
 
-    # Enable particle elements
-    particle: true
-
     # Enable RayTrace elements
     raytrace: true
 

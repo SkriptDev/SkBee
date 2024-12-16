@@ -110,7 +110,6 @@ public class AddonLoader {
         loadFishingElements();
         loadGameEventElements();
         loadItemComponentElements();
-        loadParticleElements();
         loadRayTraceElements();
         loadRecipeElements();
         loadScoreboardElements();
@@ -453,20 +452,6 @@ public class AddonLoader {
         try {
             addon.loadClasses("com.shanebeestudios.skbee.elements.worldborder");
             Util.logLoading("&5World Border Elements &asuccessfully loaded");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            pluginManager.disablePlugin(this.plugin);
-        }
-    }
-
-    private void loadParticleElements() {
-        if (!this.config.ELEMENTS_PARTICLE) {
-            Util.logLoading("&5Particle Elements &cdisabled via config");
-            return;
-        }
-        try {
-            addon.loadClasses("com.shanebeestudios.skbee.elements.particle");
-            Util.logLoading("&5Particle Elements &asuccessfully loaded");
         } catch (IOException ex) {
             ex.printStackTrace();
             pluginManager.disablePlugin(this.plugin);

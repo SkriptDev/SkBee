@@ -10,14 +10,12 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import com.shanebeestudios.skbee.api.particle.ParticleUtil;
 import com.shanebeestudios.skbee.elements.other.type.Types;
 import org.bukkit.EntityEffect;
 import org.bukkit.GameEvent;
 import org.bukkit.GameRule;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Registry;
 import org.bukkit.Statistic;
 import org.bukkit.attribute.Attribute;
@@ -49,7 +47,7 @@ import java.util.stream.Collectors;
     "set {_blocks::*} to all available blocktypes",
     "set target block to random element of all available blockdatas"})
 @Since("1.15.0")
-@SuppressWarnings({"NullableProblems", "rawtypes", "deprecation"})
+@SuppressWarnings({"rawtypes", "deprecation"})
 public class ExprAvailableMaterials extends SimpleExpression<Object> {
 
     static {
@@ -89,11 +87,6 @@ public class ExprAvailableMaterials extends SimpleExpression<Object> {
             if (lootTable != null) lootTables.add(lootTable);
         });
         Registration.registerList("loot tables", LootTable.class, lootTables.stream().sorted(Comparator.comparing(lootTable -> lootTable.getKey().getKey())).toList());
-
-        List<Particle> particles = ParticleUtil.getAvailableParticles();
-        particles = particles.stream().sorted(Comparator.comparing(ParticleUtil::getName)).collect(Collectors.toList());
-        Registration.registerList("particles", Particle.class, particles);
-
         @SuppressWarnings("deprecation")
         List<PotionEffectType> potions = Arrays.asList(PotionEffectType.values());
         potions = potions.stream().sorted(Comparator.comparing(potionEffectType -> potionEffectType.getKey().getKey())).collect(Collectors.toList());
