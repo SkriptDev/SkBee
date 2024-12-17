@@ -42,7 +42,6 @@ public class Config {
     public boolean ELEMENTS_TEAM;
     public boolean ELEMENTS_RECIPE;
     public boolean ELEMENTS_STRUCTURE;
-    public boolean ELEMENTS_VIRTUAL_FURNACE;
     public boolean ELEMENTS_TEXT_COMPONENT;
     public boolean ELEMENTS_WORLD_CREATOR;
     public boolean ELEMENTS_GAME_EVENT;
@@ -51,7 +50,6 @@ public class Config {
     public boolean ELEMENTS_VILLAGER;
     public boolean ELEMENTS_ADVANCEMENT;
     public boolean ELEMENTS_WORLD_BORDER;
-    public boolean ELEMENTS_PARTICLE;
     public boolean ELEMENTS_MINECRAFT_TAG;
     public boolean ELEMENTS_RAYTRACE;
     public boolean ELEMENTS_FISHING;
@@ -159,7 +157,6 @@ public class Config {
         this.ELEMENTS_TEAM = getElement("team");
         this.ELEMENTS_RECIPE = getElement("recipe");
         this.ELEMENTS_STRUCTURE = getElement("structure");
-        this.ELEMENTS_VIRTUAL_FURNACE = getElement("virtual-furnace");
         this.ELEMENTS_TEXT_COMPONENT = getElement("text-component");
         this.ELEMENTS_WORLD_CREATOR = getElement("world-creator");
         this.ELEMENTS_GAME_EVENT = getElement("game-event");
@@ -168,7 +165,6 @@ public class Config {
         this.ELEMENTS_VILLAGER = getElement("villager");
         this.ELEMENTS_ADVANCEMENT = getElement("advancement");
         this.ELEMENTS_WORLD_BORDER = getElement("world-border");
-        this.ELEMENTS_PARTICLE = getElement("particle");
         this.ELEMENTS_MINECRAFT_TAG = getElement("minecraft-tag");
         this.ELEMENTS_RAYTRACE = getElement("raytrace");
         this.ELEMENTS_FISHING = getElement("fishing");

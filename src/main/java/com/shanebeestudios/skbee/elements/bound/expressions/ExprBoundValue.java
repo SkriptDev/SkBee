@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.bound.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -25,25 +24,25 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("Bound - Values")
 @Description({"Get/set/delete custom values for bounds.",
-        "Some objects will be serialized as their type, others will serialize as just a string.",
-        "Numbers/Locations/Booleans/(Offline)Players/Items will be serialized as their type.",
-        "Entities will be serialized as a string version of their UUID.",
-        "All other objects will be serialized as a string.",
-        "All bound values will return a list of the values, all bound keys will return a list of keys for these values.",
-        "Deleting all bound values/keys will clear the list."})
+    "Some objects will be serialized as their type, others will serialize as just a string.",
+    "Numbers/Locations/Booleans/(Offline)Players/Items will be serialized as their type.",
+    "Entities will be serialized as a string version of their UUID.",
+    "All other objects will be serialized as a string.",
+    "All bound values will return a list of the values, all bound keys will return a list of keys for these values.",
+    "Deleting all bound values/keys will clear the list."})
 @Examples({"set bound value \"king\" of bound with id \"the_garden\" to player",
-        "set {_v} to bound value \"king\" of {_bound}",
-        "delete bound value \"spawn\" of {_bound}",
-        "set {_values::*} to all bound values of bound with id \"ma_bound\"",
-        "set {_keys::*} to all bound keys of bound with id \"look_mah_imma_bound\"",
-        "delete all bound values from bound with id \"now_im_a_sad_valueless_bound\""})
+    "set {_v} to bound value \"king\" of {_bound}",
+    "delete bound value \"spawn\" of {_bound}",
+    "set {_values::*} to all bound values of bound with id \"ma_bound\"",
+    "set {_keys::*} to all bound keys of bound with id \"look_mah_imma_bound\"",
+    "delete all bound values from bound with id \"now_im_a_sad_valueless_bound\""})
 @Since("2.2.0")
 public class ExprBoundValue extends SimpleExpression<Object> {
 
     static {
         Skript.registerExpression(ExprBoundValue.class, Object.class, ExpressionType.COMBINED,
-                "bound value %string% (of|from) %bound%",
-                "all [[of] the] bound (values|1:keys) (of|from) %bound%");
+            "bound value %string% (of|from) %bound%",
+            "all [[of] the] bound (values|1:keys) (of|from) %bound%");
     }
 
     private int pattern;
@@ -71,9 +70,6 @@ public class ExprBoundValue extends SimpleExpression<Object> {
             String key = this.key.getSingle(event);
             if (key != null) {
                 Object value = bound.getValue(key);
-                if (value instanceof ItemStack itemStack) {
-                    value = new ItemType(itemStack);
-                }
                 return new Object[]{value};
             }
         } else if (pattern == 1) {
@@ -110,10 +106,8 @@ public class ExprBoundValue extends SimpleExpression<Object> {
             Object object = delta[0];
             Object changed;
             if (object instanceof ItemStack || object instanceof Boolean || object instanceof Number ||
-                    object instanceof String || object instanceof Location) {
+                object instanceof String || object instanceof Location) {
                 changed = object;
-            } else if (object instanceof ItemType itemType) {
-                changed = itemType.getRandom();
             } else if (object instanceof OfflinePlayer offlinePlayer) {
                 changed = offlinePlayer;
             } else if (object instanceof Entity entity) {

@@ -1,16 +1,17 @@
 package com.shanebeestudios.skbee.elements.other.events;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.entity.EntityData;
+import ch.njol.skript.bukkitutil.EntityCategory;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.jetbrains.annotations.NotNull;
@@ -20,18 +21,18 @@ public class EvtDamageByBlock extends SkriptEvent {
 
     static {
         Skript.registerEvent("Damage By Block", EvtDamageByBlock.class, EntityDamageByBlockEvent.class,
-                        "damag(e|ing) [of %-entitydata%] (by|from) (block|%itemtypes/blockdatas%)")
-                .description("Called when an entity is damaged by a block.",
-                        "Anything that works in vanilla Skript's damage event (victim/damage cause/damage/final damage)",
-                        "will all work in this event too.",
-                        "\n`victim` = Same as vanilla Skript, `victim` is used to get the damaged entity.",
-                        "\n`event-block` = The block that damaged the entity")
-                .examples("on damage of player by sweet berry bush:",
-                        "\tcancel event",
-                        "",
-                        "on damage by block:",
-                        "\tbroadcast \"%victim% was damaged by %type of event-block%\"")
-                .since("3.0.2");
+                "damag(e|ing) [of %-entitytypes/entitycategories%] (by|from) (block|%materials/blockdatas%)")
+            .description("Called when an entity is damaged by a block.",
+                "Anything that works in vanilla Skript's damage event (victim/damage cause/damage/final damage)",
+                "will all work in this event too.",
+                "\n`victim` = Same as vanilla Skript, `victim` is used to get the damaged entity.",
+                "\n`event-block` = The block that damaged the entity")
+            .examples("on damage of player by sweet berry bush:",
+                "\tcancel event",
+                "",
+                "on damage by block:",
+                "\tbroadcast \"%victim% was damaged by %type of event-block%\"")
+            .since("3.0.2");
 
         EventValues.registerEventValue(EntityDamageByBlockEvent.class, Block.class, new Getter<>() {
             @Override
@@ -41,13 +42,13 @@ public class EvtDamageByBlock extends SkriptEvent {
         }, EventValues.TIME_NOW);
     }
 
-    private Literal<EntityData<?>> entityType;
+    private Literal<?> entityType;
     private Literal<?> blockType;
 
     @SuppressWarnings({"NullableProblems", "unchecked"})
     @Override
     public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
-        this.entityType = (Literal<EntityData<?>>) args[0];
+        this.entityType = args[0];
         this.blockType = args[1];
         return true;
     }
@@ -64,9 +65,9 @@ public class EvtDamageByBlock extends SkriptEvent {
     // Copied from Skript
     private boolean checkDamaged(Entity entity) {
         if (this.entityType != null) {
-            for (EntityData<?> entityData : this.entityType.getAll()) {
-                if (entityData.isInstance(entity))
-                    return true;
+            for (Object entityData : this.entityType.getAll()) {
+                if (entityData instanceof EntityType entityType && entityType == entity.getType()) return true;
+                else if (entityData instanceof EntityCategory ec && ec.isOfType(entity)) return true;
             }
             return false;
         }
@@ -77,8 +78,8 @@ public class EvtDamageByBlock extends SkriptEvent {
         if (this.blockType != null) {
             BlockData data = block.getBlockData();
             for (Object object : this.blockType.getAll()) {
-                if (object instanceof ItemType itemType) {
-                    if (itemType.isOfType(block)) return true;
+                if (object instanceof Material itemType) {
+                    if (itemType == block.getType()) return true;
                 } else if (object instanceof BlockData blockData) {
                     if (data.matches(blockData)) return true;
                 }

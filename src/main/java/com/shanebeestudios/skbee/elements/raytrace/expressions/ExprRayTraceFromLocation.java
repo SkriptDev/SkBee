@@ -41,7 +41,7 @@ public class ExprRayTraceFromLocation extends SimpleExpression<RayTraceResult> {
     static {
         Skript.registerExpression(ExprRayTraceFromLocation.class, RayTraceResult.class, ExpressionType.COMBINED,
                 "ray[ ]trace from %location% along %vectors% [with max distance %-number%] [with ray size %-number%]  " +
-                        "[ignore:while ignoring passable blocks] [while ignoring %-entities/entitydatas%]");
+                        "[ignore:while ignoring passable blocks] [while ignoring %-entities/entitytypes/entitycategories%]");
     }
 
     private Expression<Location> location;

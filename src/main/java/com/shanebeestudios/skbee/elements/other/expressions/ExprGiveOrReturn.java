@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -10,6 +9,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.util.LiteralUtils;
 import ch.njol.util.Kleenean;
 import com.shanebeestudios.skbee.api.util.ItemUtils;
 import org.bukkit.event.Event;
@@ -33,53 +33,54 @@ import java.util.List;
     "if {_i::*} is set:",
     "\tdrop {_i::*} above target block without velocity"})
 @Since("3.0.0")
-public class ExprGiveOrReturn extends SimpleExpression<ItemType> {
+public class ExprGiveOrReturn extends SimpleExpression<ItemStack> {
 
     static {
-        Skript.registerExpression(ExprGiveOrReturn.class, ItemType.class, ExpressionType.COMBINED,
-            "(give|add) or return %itemtypes% to %inventories%");
+        Skript.registerExpression(ExprGiveOrReturn.class, ItemStack.class, ExpressionType.COMBINED,
+            "(give|add) or return %materials/itemstacks% to %inventories%");
     }
 
-    private Expression<ItemType> itemTypes;
+    private Expression<?> objects;
     private Expression<Inventory> inventories;
 
     @SuppressWarnings({"unchecked", "NullableProblems"})
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        this.itemTypes = (Expression<ItemType>) exprs[0];
+        this.objects = LiteralUtils.defendExpression(exprs[0]);
         this.inventories = (Expression<Inventory>) exprs[1];
         return true;
     }
 
     @SuppressWarnings("NullableProblems")
     @Override
-    protected @Nullable ItemType[] get(Event event) {
-        List<ItemStack> itemStacks = ItemUtils.addItemTypesToList(Arrays.asList(this.itemTypes.getArray(event)), null);
+    protected @Nullable ItemStack[] get(Event event) {
+        List<ItemStack> itemStacks = ItemUtils.addItemTypesToList(Arrays.asList(this.objects.getArray(event)), null);
+        assert itemStacks != null;
         ItemStack[] itemStacksArray = itemStacks.toArray(itemStacks.toArray(new ItemStack[0]));
 
-        List<ItemType> returns = new ArrayList<>();
+        List<ItemStack> returns = new ArrayList<>();
         for (Inventory inventory : this.inventories.getArray(event)) {
             HashMap<Integer, ItemStack> leftOvers = inventory.addItem(itemStacksArray);
             if (!leftOvers.isEmpty()) {
-                leftOvers.values().forEach(itemStack -> returns.add(new ItemType(itemStack)));
+                returns.addAll(leftOvers.values());
             }
         }
-        return returns.toArray(new ItemType[0]);
+        return returns.toArray(new ItemStack[0]);
     }
 
     @Override
     public boolean isSingle() {
-        return this.itemTypes.isSingle() && this.inventories.isSingle();
+        return this.objects.isSingle() && this.inventories.isSingle();
     }
 
     @Override
-    public @NotNull Class<? extends ItemType> getReturnType() {
-        return ItemType.class;
+    public @NotNull Class<? extends ItemStack> getReturnType() {
+        return ItemStack.class;
     }
 
     @Override
     public @NotNull String toString(Event e, boolean d) {
-        return "give or return " + this.itemTypes.toString(e, d) + " to " + this.inventories.toString(e, d);
+        return "give or return " + this.objects.toString(e, d) + " to " + this.inventories.toString(e, d);
     }
 
 }

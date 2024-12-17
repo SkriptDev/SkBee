@@ -1,6 +1,5 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -10,6 +9,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import com.shanebeestudios.skbee.elements.other.type.Types;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.jetbrains.annotations.NotNull;
@@ -17,22 +17,22 @@ import org.jetbrains.annotations.Nullable;
 
 @Name("ArmorTrim - Item")
 @Description({"Represents the armor trim of an item. You can get, set, add or delete/reset.",
-        "Requires Minecraft 1.19.4+"})
+    "Requires Minecraft 1.19.4+"})
 @Examples({"add armor trim from gold_material and eye_pattern to armor trim of player's leggings",
-        "set armor trim of player's helmet to armor trim from gold_material and eye_pattern",
-        "delete armor trim of player's leggings",
-        "reset armor trim of player's boots"})
+    "set armor trim of player's helmet to armor trim from gold_material and eye_pattern",
+    "delete armor trim of player's leggings",
+    "reset armor trim of player's boots"})
 @Since("2.13.0")
-public class ExprArmorTrimItem extends SimplePropertyExpression<ItemType, ArmorTrim> {
+public class ExprArmorTrimItem extends SimplePropertyExpression<ItemStack, ArmorTrim> {
 
     static {
         if (Types.HAS_ARMOR_TRIM) {
-            register(ExprArmorTrimItem.class, ArmorTrim.class, "armor trim", "itemtypes");
+            register(ExprArmorTrimItem.class, ArmorTrim.class, "armor trim", "itemstacks");
         }
     }
 
     @Override
-    public @Nullable ArmorTrim convert(ItemType itemType) {
+    public @Nullable ArmorTrim convert(ItemStack itemType) {
         if (itemType.getItemMeta() instanceof ArmorMeta armorMeta) {
             return armorMeta.getTrim();
         }
@@ -52,7 +52,7 @@ public class ExprArmorTrimItem extends SimplePropertyExpression<ItemType, ArmorT
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         ArmorTrim trim = null;
         if (delta != null && delta[0] instanceof ArmorTrim armorTrim) trim = armorTrim;
-        for (ItemType itemType : getExpr().getArray(event)) {
+        for (ItemStack itemType : getExpr().getArray(event)) {
             if (itemType.getItemMeta() instanceof ArmorMeta armorMeta) {
                 armorMeta.setTrim(trim);
                 itemType.setItemMeta(armorMeta);

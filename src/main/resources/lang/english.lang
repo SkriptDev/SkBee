@@ -20,6 +20,7 @@ types:
     criteria: criteria¦s
     damagesource: damage source¦s
     damagetype: damage type¦s
+    datacomponenttype: data component type¦s
     displaybillboard: display billboard¦s
     displaybrightness: display brightness¦es
     displayslot: display slot¦s
@@ -43,13 +44,11 @@ types:
     merchantinventory: merchant inventor¦y¦ies
     merchantrecipe: merchant recipe¦s
     minecraftentitytype: minecraft entity type¦s
-    minecrafttag: minecraft tag¦s
     mirror: mirror¦s
     namespacedkey: namespacedkey¦s
     nbtcompound: nbt compound¦s @an
     nbttype: nbt type¦s @an
     objective: objective¦s
-    particle: particle¦s @-
     playerspawnchangereason: player spawn change reason¦s
     pose: pose¦s
     potioneffectcause: potion effect cause¦s
@@ -67,6 +66,7 @@ types:
     structure: structure¦s
     structurerotation: structure rotation¦s
     tagresolver: tag resolver¦s
+    targetcolor: target color¦s
     team: team¦s
     teamoption: team options¦s
     teamoptionstatus: team option status¦es

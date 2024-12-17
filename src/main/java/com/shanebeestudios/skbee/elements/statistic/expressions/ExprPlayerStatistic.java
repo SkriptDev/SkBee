@@ -1,14 +1,11 @@
 package com.shanebeestudios.skbee.elements.statistic.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -21,8 +18,8 @@ import org.bukkit.Statistic;
 import org.bukkit.Statistic.Type;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +27,16 @@ import java.util.List;
 @Name("Statistic - Get/Set")
 @Description("Represents the statistic of a Player. You can get, set, add, remove or reset stats.")
 @Examples({"set {_s} to kill entity stat using sheep for player",
-        "set kill entity stat using zombie for player to 10",
-        "add 10 to mine block stat using diamond ore for player",
-        "remove 10 from chest opened stat for player",
-        "reset mob kills stat for player"})
+    "set kill entity stat using zombie for player to 10",
+    "add 10 to mine block stat using diamond ore for player",
+    "remove 10 from chest opened stat for player",
+    "reset mob kills stat for player"})
 @Since("1.17.0")
 public class ExprPlayerStatistic extends SimpleExpression<Number> {
 
     static {
         Skript.registerExpression(ExprPlayerStatistic.class, Number.class, ExpressionType.COMBINED,
-                "%statistic% stat[istic] [using %-entitydata/itemtype%] (of|for) %offlineplayers%");
+            "%statistic% stat[istic] [using %-entitytype/material%] (of|for) %offlineplayers%");
     }
 
     private Expression<Statistic> statistic;
@@ -104,16 +101,13 @@ public class ExprPlayerStatistic extends SimpleExpression<Number> {
         Type statType = statistic.getType();
         if (statType == Type.UNTYPED) {
             player.setStatistic(statistic, change);
-        } else if (statType == Type.ENTITY && qualifier instanceof EntityData<?> entityData) {
-            EntityType entityType = EntityUtils.toBukkitEntityType(entityData);
+        } else if (statType == Type.ENTITY && qualifier instanceof EntityType entityType) {
             player.setStatistic(statistic, entityType, change);
-        } else if (statType == Type.BLOCK && qualifier instanceof ItemType itemType) {
-            Material material = itemType.getMaterial();
+        } else if (statType == Type.BLOCK && qualifier instanceof Material material) {
             if (material.isBlock()) {
                 player.setStatistic(statistic, material, change);
             }
-        } else if (statType == Type.ITEM && qualifier instanceof ItemType itemType) {
-            Material material = itemType.getMaterial();
+        } else if (statType == Type.ITEM && qualifier instanceof Material material) {
             if (material.isItem()) {
                 player.setStatistic(statistic, material, change);
             }
@@ -124,16 +118,13 @@ public class ExprPlayerStatistic extends SimpleExpression<Number> {
         Type statType = statistic.getType();
         if (statType == Type.UNTYPED) {
             return player.getStatistic(statistic);
-        } else if (statType == Type.ENTITY && qualifier instanceof EntityData<?> entityData) {
-            EntityType entityType = EntityUtils.toBukkitEntityType(entityData);
+        } else if (statType == Type.ENTITY && qualifier instanceof EntityType entityType) {
             return player.getStatistic(statistic, entityType);
-        } else if (statType == Type.BLOCK && qualifier instanceof ItemType itemType) {
-            Material material = itemType.getMaterial();
+        } else if (statType == Type.BLOCK && qualifier instanceof Material material) {
             if (material.isBlock()) {
                 return player.getStatistic(statistic, material);
             }
-        } else if (statType == Type.ITEM && qualifier instanceof ItemType itemType) {
-            Material material = itemType.getMaterial();
+        } else if (statType == Type.ITEM && qualifier instanceof Material material) {
             if (material.isItem()) {
                 return player.getStatistic(statistic, material);
             }

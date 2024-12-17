@@ -6,6 +6,6 @@ test "SkBee - chunk stuff":
     load chunk at {_l} with ticket
     assert chunk at {_l} is loaded with "Chunk at location should be loaded"
 
-    unload chunk at {_l}
-    wait 5 ticks # Do Skript tests even support waits?!?!?
-    assert chunk at {_l} is not loaded with "Chunk at location should have unloaded"
+    # Can't test this, need a wait after chunk is unloaded to test
+    #unload chunk at {_l}
+    #assert chunk at {_l} is not loaded with "Chunk at location should have unloaded"

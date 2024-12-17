@@ -22,9 +22,6 @@ repositories {
     // Paper
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
 
-    // Skript
-    maven { url 'https://repo.skriptlang.org/releases' }
-
     // JitPack
     maven { url 'https://jitpack.io' }
 
@@ -34,29 +31,24 @@ repositories {
 
 dependencies {
     // Paper
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
     // Skript
-    compileOnly(group: 'com.github.SkriptLang', name: 'Skript', version: '2.8.7') {
+    compileOnly(group: 'com.github.SkriptDev', name: 'Skript', version: '3.0.0-Beta4') {
         transitive = false
     }
 
     // commons-io
-    compileOnly("commons-io:commons-io:2.11.0")
+    compileOnly('commons-io:commons-io:2.14.0')
     compileOnly("org.apache.commons:commons-text:1.10.0")
 
     // NBT-API
-    implementation("de.tr7zw:item-nbt-api:2.13.2") {
+    implementation("de.tr7zw:item-nbt-api:2.14.1-SNAPSHOT") {
         transitive = false
     }
 
     // FastBoard
     implementation("fr.mrmicky:fastboard:2.1.3")
-
-    // Virtual Furnace
-    implementation("com.github.ShaneBeeStudios:VirtualFurnace:1.0.0") {
-        transitive = false
-    }
 
     // bStats
     implementation(group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.2')
@@ -100,7 +92,7 @@ shadowJar {
 tasks.register('server', Copy) {
     from shadowJar
     // Change this to wherever you want your jar to build
-    into '/Users/ShaneBee/Desktop/Server/Skript/1-21-1/plugins'
+    into '/Users/ShaneBee/Desktop/Server/SkriptThree/1-21-4/plugins'
 }
 
 publishing {

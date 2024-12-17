@@ -1,13 +1,13 @@
 package com.shanebeestudios.skbee.api.util;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.entity.EntityData;
 import com.shanebeestudios.skbee.api.reflection.ReflectionConstants;
 import com.shanebeestudios.skbee.api.reflection.ReflectionUtils;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,8 +43,8 @@ public class EntityUtils {
                 for (Object object : ignored) {
                     if (object instanceof Entity entity) {
                         if (filterEntity == entity) return false;
-                    } else if (object instanceof EntityData<?> ed) {
-                        if (ed.isInstance(filterEntity)) return false;
+                    } else if (object instanceof EntityType entityType) {
+                        if (filterEntity.getType() == entityType) return false;
                     }
                 }
             }

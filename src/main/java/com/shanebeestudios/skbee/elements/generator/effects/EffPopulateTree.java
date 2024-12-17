@@ -30,7 +30,7 @@ public class EffPopulateTree extends Effect {
 
     static {
         Skript.registerEffect(EffPopulateTree.class,
-            "populate %bukkittreetype% at %vectors%");
+            "populate %treetype% at %vectors%");
     }
 
     private Expression<TreeType> treeType;

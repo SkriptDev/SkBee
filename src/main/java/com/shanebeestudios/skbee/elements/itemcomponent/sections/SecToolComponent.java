@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.sections;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -14,10 +13,11 @@ import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Tool;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.ToolComponent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.lang.entry.EntryContainer;
@@ -26,9 +26,9 @@ import org.skriptlang.skript.lang.entry.util.ExpressionEntryData;
 
 import java.util.List;
 
-@SuppressWarnings("DataFlowIssue")
+@SuppressWarnings("UnstableApiUsage")
 @Name("ItemComponent - Tool Component Apply")
-@Description({"Apply a tool component to any item making it usable tool. Requires Minecraft 1.20.5+",
+@Description({"Apply a tool component to any item making it usable tool.",
     "See [**McWiki Tool Component**](https://minecraft.wiki/w/Data_component_format#tool) for more details.",
     "",
     "**Entries/Sections**:",
@@ -54,14 +54,14 @@ public class SecToolComponent extends Section {
 
     public static class ToolComponentApplyRulesEvent extends Event {
 
-        private final ToolComponent component;
+        private final Tool.Builder toolBuilder;
 
-        public ToolComponentApplyRulesEvent(ToolComponent component) {
-            this.component = component;
+        public ToolComponentApplyRulesEvent(Tool.Builder toolBuilder) {
+            this.toolBuilder = toolBuilder;
         }
 
-        public ToolComponent getComponent() {
-            return this.component;
+        public Tool.Builder getToolBuilder() {
+            return this.toolBuilder;
         }
 
         @Override
@@ -77,22 +77,22 @@ public class SecToolComponent extends Section {
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("default mining speed", null, true, Number.class));
             VALIDATIOR.addEntryData(new ExpressionEntryData<>("damage per block", null, true, Number.class));
             VALIDATIOR.addSection("rules", true);
-            Skript.registerSection(SecToolComponent.class, "apply tool component to %itemtypes%");
+            Skript.registerSection(SecToolComponent.class, "apply tool component to %itemstacks%");
         }
     }
 
-    private Expression<ItemType> items;
+    private Expression<ItemStack> items;
     private Expression<Number> defaultMiningSpeed;
     private Expression<Number> damagePerBlock;
     private Trigger rulesSection;
 
-    @SuppressWarnings({"NullableProblems", "unchecked"})
+    @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult, SectionNode sectionNode, List<TriggerItem> triggerItems) {
         EntryContainer container = VALIDATIOR.build().validate(sectionNode);
         if (container == null) return false;
 
-        this.items = (Expression<ItemType>) exprs[0];
+        this.items = (Expression<ItemStack>) exprs[0];
         this.defaultMiningSpeed = (Expression<Number>) container.getOptional("default mining speed", false);
         this.damagePerBlock = (Expression<Number>) container.getOptional("damage per block", false);
 
@@ -103,7 +103,6 @@ public class SecToolComponent extends Section {
         return true;
     }
 
-    @SuppressWarnings({"NullableProblems"})
     @Override
     protected @Nullable TriggerItem walk(Event event) {
         Object localVars = Variables.copyLocalVariables(event);
@@ -111,28 +110,25 @@ public class SecToolComponent extends Section {
         Number defaultMiningSpeed = this.defaultMiningSpeed != null ? this.defaultMiningSpeed.getSingle(event) : null;
         Number damagePerBlock = this.damagePerBlock != null ? this.damagePerBlock.getSingle(event) : null;
 
-        for (ItemType itemType : this.items.getArray(event)) {
-            ItemMeta itemMeta = itemType.getItemMeta();
-
-            ToolComponent tool = itemMeta.getTool();
+        for (ItemStack itemStack : this.items.getArray(event)) {
+            Tool.Builder toolBuilder = Tool.tool();
             if (defaultMiningSpeed != null) {
-                tool.setDefaultMiningSpeed(defaultMiningSpeed.floatValue());
+                toolBuilder.defaultMiningSpeed(defaultMiningSpeed.floatValue());
             }
             if (damagePerBlock != null) {
                 int dpb = damagePerBlock.intValue();
-                if (dpb >= 0) tool.setDamagePerBlock(dpb);
+                if (dpb >= 0) toolBuilder.damagePerBlock(dpb);
             }
 
             if (this.rulesSection != null) {
-                ToolComponentApplyRulesEvent toolEvent = new ToolComponentApplyRulesEvent(tool);
+                ToolComponentApplyRulesEvent toolEvent = new ToolComponentApplyRulesEvent(toolBuilder);
                 Variables.setLocalVariables(toolEvent, localVars);
                 TriggerItem.walk(this.rulesSection, toolEvent);
                 Variables.setLocalVariables(event, Variables.copyLocalVariables(toolEvent));
                 Variables.removeLocals(toolEvent);
             }
 
-            itemMeta.setTool(tool);
-            itemType.setItemMeta(itemMeta);
+            itemStack.setData(DataComponentTypes.TOOL, toolBuilder);
         }
 
         return super.walk(event, false);

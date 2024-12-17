@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -15,6 +14,7 @@ import ch.njol.util.Kleenean;
 import org.bukkit.entity.Item;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,17 +23,17 @@ import java.util.List;
 
 @Name("Block Dropped Items")
 @Description({"Represents the dropped items in a block drop item event.",
-        "`block dropped items` = The dropped item entities.",
-        "`block dropped itemtypes` = The dropped item."})
+    "`block dropped items` = The dropped item entities.",
+    "`block dropped itemstacks` = The dropped ItemStack."})
 @Examples({"on block drop item:",
-        "\tteleport block dropped items to player"})
+    "\tteleport block dropped items to player"})
 @Since("2.6.0")
 public class ExprBlockDrops extends SimpleExpression<Object> {
 
     static {
         Skript.registerExpression(ExprBlockDrops.class, Object.class, ExpressionType.SIMPLE,
-                "block dropped (items|item entities)",
-                "block dropped itemtypes");
+            "block dropped (items|item entities)",
+            "block dropped itemstacks");
     }
 
     private boolean itemType;
@@ -55,9 +55,9 @@ public class ExprBlockDrops extends SimpleExpression<Object> {
         BlockDropItemEvent dropEvent = (BlockDropItemEvent) event;
         List<Item> items = dropEvent.getItems();
         if (this.itemType) {
-            List<ItemType> itemTypes = new ArrayList<>();
-            items.forEach(item -> itemTypes.add(new ItemType(item.getItemStack())));
-            return itemTypes.toArray(new ItemType[0]);
+            List<ItemStack> itemStacks = new ArrayList<>();
+            items.forEach(item -> itemStacks.add(item.getItemStack()));
+            return itemStacks.toArray(new ItemStack[0]);
         }
         return items.toArray(new Item[0]);
     }
@@ -69,7 +69,7 @@ public class ExprBlockDrops extends SimpleExpression<Object> {
 
     @Override
     public @NotNull Class<?> getReturnType() {
-        return this.itemType ? ItemType.class : Item.class;
+        return this.itemType ? ItemStack.class : Item.class;
     }
 
     @Override

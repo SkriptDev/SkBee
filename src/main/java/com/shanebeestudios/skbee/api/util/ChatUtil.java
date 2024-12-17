@@ -1,11 +1,7 @@
 package com.shanebeestudios.skbee.api.util;
 
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.bukkitutil.EntityUtils;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.util.Color;
 import ch.njol.skript.util.SkriptColor;
-import ch.njol.skript.util.slot.Slot;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.translation.Translatable;
 import net.md_5.bungee.api.ChatColor;
@@ -71,16 +67,8 @@ public enum ChatUtil {
         if (object instanceof Entity entity) {
             EntityType type = entity.getType();
             return Bukkit.getUnsafe().getTranslationKey(type);
-        } else if (object instanceof EntityData<?> entityData) {
-            EntityType type = EntityUtils.toBukkitEntityType(entityData);
-            return Bukkit.getUnsafe().getTranslationKey(type);
         } else if (object instanceof ItemStack itemStack) {
             return itemStack.getType().translationKey();
-        } else if (object instanceof ItemType itemType) {
-            return itemType.getMaterial().translationKey();
-        } else if (object instanceof Slot slot) {
-            if (slot.getItem() == null) return null;
-            return slot.getItem().translationKey();
         } else if (object instanceof String string) {
             return string;
         } else if (object instanceof Translatable translatable) {

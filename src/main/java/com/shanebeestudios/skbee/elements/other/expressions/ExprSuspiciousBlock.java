@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -22,22 +21,22 @@ import org.jetbrains.annotations.Nullable;
 @Name("Suspicious Block - Item")
 @Description({"Represents the item hiding in a Suspicious Block. Requires Minecraft 1.19.4+"})
 @Examples({"set suspicious item of target block to a diamond",
-        "delete suspicious item of block at location(199,10,-199, \"very_goodNames\")"})
+    "delete suspicious item of block at location(199,10,-199, \"very_goodNames\")"})
 @Since("2.8.1, 2.14.0 (suspicious gravel)")
-public class ExprSuspiciousBlock extends SimplePropertyExpression<Block, ItemType> {
+public class ExprSuspiciousBlock extends SimplePropertyExpression<Block, ItemStack> {
 
     private static final boolean HAS_SUSPICIOUS_SAND = Skript.classExists("org.bukkit.block.SuspiciousSand");
     private static final boolean HAS_BRUSHABLE_BLOCK = Skript.classExists("org.bukkit.block.BrushableBlock");
 
     static {
         if (HAS_BRUSHABLE_BLOCK || HAS_SUSPICIOUS_SAND) {
-            register(ExprSuspiciousBlock.class, ItemType.class, "suspicious item", "blocks");
+            register(ExprSuspiciousBlock.class, ItemStack.class, "suspicious item", "blocks");
         }
     }
 
     @SuppressWarnings({"deprecation", "removal"})
     @Override
-    public @Nullable ItemType convert(Block block) {
+    public @Nullable ItemStack convert(Block block) {
         BlockState state = block.getState();
         ItemStack itemStack = null;
         if (HAS_BRUSHABLE_BLOCK && state instanceof BrushableBlock brushableBlock) {
@@ -45,23 +44,22 @@ public class ExprSuspiciousBlock extends SimplePropertyExpression<Block, ItemTyp
         } else if (HAS_SUSPICIOUS_SAND && state instanceof SuspiciousSand suspiciousSand) {
             itemStack = suspiciousSand.getItem();
         }
-        if (itemStack != null && !itemStack.getType().isAir()) return new ItemType(itemStack);
+        if (itemStack != null && !itemStack.getType().isAir()) return itemStack;
         return null;
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
         if (mode == ChangeMode.SET || mode == ChangeMode.DELETE)
-            return CollectionUtils.array(ItemType.class);
+            return CollectionUtils.array(ItemStack.class);
         return null;
     }
 
-    @SuppressWarnings({"NullableProblems", "ConstantValue", "deprecation", "removal"})
+    @SuppressWarnings("removal")
     @Override
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         ItemStack itemStack = null;
-        if (delta != null && delta[0] instanceof ItemType itemType) itemStack = itemType.getRandom();
+        if (delta != null && delta[0] instanceof ItemStack is) itemStack = is;
 
         for (Block block : getExpr().getArray(event)) {
             BlockState state = block.getState();
@@ -76,8 +74,8 @@ public class ExprSuspiciousBlock extends SimplePropertyExpression<Block, ItemTyp
     }
 
     @Override
-    public @NotNull Class<? extends ItemType> getReturnType() {
-        return ItemType.class;
+    public @NotNull Class<? extends ItemStack> getReturnType() {
+        return ItemStack.class;
     }
 
     @Override

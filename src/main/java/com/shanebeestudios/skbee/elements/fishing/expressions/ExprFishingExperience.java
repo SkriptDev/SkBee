@@ -10,7 +10,6 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.util.Experience;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -21,17 +20,16 @@ import org.jetbrains.annotations.Nullable;
 @Name("Fishing - Experience")
 @Description("Get and modify the amount of experience dropped in a fishing event.")
 @Examples({"on fishing:",
-        "\tadd 10xp to fishing experience",
-        "\tsend fishing experience to player"})
+    "\tadd 10 to fishing experience",
+    "\tsend fishing experience to player"})
 @Since("2.14.0")
-public class ExprFishingExperience extends SimpleExpression<Experience> {
+public class ExprFishingExperience extends SimpleExpression<Number> {
 
     static {
-        Skript.registerExpression(ExprFishingExperience.class, Experience.class, ExpressionType.SIMPLE,
-                "fish[ing] [event] experience");
+        Skript.registerExpression(ExprFishingExperience.class, Number.class, ExpressionType.SIMPLE,
+            "fish[ing] [event] experience");
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
         if (!getParser().isCurrentEvent(PlayerFishEvent.class)) {
@@ -41,24 +39,23 @@ public class ExprFishingExperience extends SimpleExpression<Experience> {
         return true;
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
-    protected @Nullable Experience[] get(Event event) {
-        Experience experience = new Experience(((PlayerFishEvent) event).getExpToDrop());
-        return new Experience[]{experience};
+    protected @Nullable Number[] get(Event event) {
+        if (!(event instanceof PlayerFishEvent playerFishEvent)) {
+            return null;
+        }
+        return new Number[]{playerFishEvent.getExpToDrop()};
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
         return switch (mode) {
-            case SET, ADD, REMOVE -> CollectionUtils.array(Experience.class, Number.class);
+            case SET, ADD, REMOVE -> CollectionUtils.array(Number.class);
             case DELETE -> CollectionUtils.array();
             default -> null;
         };
     }
 
-    @SuppressWarnings({"NullableProblems", "ConstantValue", "DataFlowIssue"})
     @Override
     public void change(Event event, @Nullable Object[] delta, ChangeMode mode) {
         if (!(event instanceof PlayerFishEvent playerFishEvent)) return;
@@ -66,7 +63,7 @@ public class ExprFishingExperience extends SimpleExpression<Experience> {
             playerFishEvent.setExpToDrop(0);
             return;
         }
-        int experience = delta[0] instanceof Experience ? ((Experience) delta[0]).getXP() : ((Number) delta[0]).intValue();
+        int experience = delta[0] instanceof Number number ? number.intValue() : 0;
         int curentExperience = playerFishEvent.getExpToDrop();
         int value = 0;
         switch (mode) {
@@ -86,8 +83,8 @@ public class ExprFishingExperience extends SimpleExpression<Experience> {
     }
 
     @Override
-    public @NotNull Class<? extends Experience> getReturnType() {
-        return Experience.class;
+    public @NotNull Class<? extends Number> getReturnType() {
+        return Number.class;
     }
 
     @Override

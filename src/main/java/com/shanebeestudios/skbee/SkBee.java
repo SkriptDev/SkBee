@@ -11,7 +11,6 @@ import com.shanebeestudios.skbee.config.BoundConfig;
 import com.shanebeestudios.skbee.config.Config;
 import com.shanebeestudios.skbee.elements.other.sections.SecRunTaskLater;
 import com.shanebeestudios.skbee.elements.worldcreator.objects.BeeWorldConfig;
-import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
@@ -35,7 +34,6 @@ public class SkBee extends JavaPlugin {
     private static SkBee instance;
     private Config config;
     BoundConfig boundConfig = null;
-    VirtualFurnaceAPI virtualFurnaceAPI;
     BeeWorldConfig beeWorldConfig;
     StructureManager structureManager = null;
     private AddonLoader addonLoader = null;
@@ -94,7 +92,6 @@ public class SkBee extends JavaPlugin {
     private void loadMetrics() { //6719
         Metrics metrics = new Metrics(this, 6719);
         metrics.addCustomChart(new SimplePie("skript_version", () -> Skript.getVersion().toString()));
-        metrics.addCustomChart(new SimplePie("virtual_furnace", () -> String.valueOf(config.ELEMENTS_VIRTUAL_FURNACE)));
     }
 
     /**
@@ -104,9 +101,6 @@ public class SkBee extends JavaPlugin {
     public void onDisable() {
         // Cancel tasks on stop to prevent async issues
         SecRunTaskLater.cancelTasks();
-        if (this.virtualFurnaceAPI != null) {
-            this.virtualFurnaceAPI.disableAPI();
-        }
         if (this.boundConfig != null) {
             this.boundConfig.saveAllBounds();
         }
@@ -147,15 +141,6 @@ public class SkBee extends JavaPlugin {
      */
     public BeeWorldConfig getBeeWorldConfig() {
         return beeWorldConfig;
-    }
-
-    /**
-     * Get an instance of the {@link VirtualFurnaceAPI}
-     *
-     * @return Instance of the Virtual Furnace API
-     */
-    public VirtualFurnaceAPI getVirtualFurnaceAPI() {
-        return virtualFurnaceAPI;
     }
 
     /**

@@ -1,17 +1,17 @@
 package com.shanebeestudios.skbee.elements.other.events;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.lang.util.SimpleEvent;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.BlockStateBlock;
 import ch.njol.skript.util.Getter;
 import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.slot.Slot;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.shanebeestudios.skbee.api.event.EntityBlockInteractEvent;
 import com.shanebeestudios.skbee.api.util.Util;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -88,45 +88,10 @@ public class OtherEvents extends SimpleEvent {
                 "\t\t\t\tset repair cost of event-inventory to 30")
             .since("1.11.0");
 
-        EventValues.registerEventValue(PrepareAnvilEvent.class, Slot.class, new Getter<>() {
+        EventValues.registerEventValue(PrepareAnvilEvent.class, ItemStack.class, new Getter<>() {
             @Override
-            public Slot get(PrepareAnvilEvent event) {
-                return new Slot() {
-                    final ItemStack result = event.getResult();
-
-                    @Nullable
-                    @Override
-                    public ItemStack getItem() {
-                        return result;
-                    }
-
-                    @Override
-                    public void setItem(@Nullable ItemStack item) {
-                        event.setResult(item);
-                    }
-
-                    @Override
-                    public int getAmount() {
-                        if (result != null) return result.getAmount();
-                        return 0;
-                    }
-
-                    @Override
-                    public void setAmount(int amount) {
-                        if (result != null) result.setAmount(amount);
-                    }
-
-                    @Override
-                    public boolean isSameSlot(@NotNull Slot o) {
-                        ItemStack item = o.getItem();
-                        return item != null && item.isSimilar(result);
-                    }
-
-                    @Override
-                    public @NotNull String toString(@Nullable Event e, boolean debug) {
-                        return "anvil inventory result slot";
-                    }
-                };
+            public ItemStack get(PrepareAnvilEvent event) {
+                return event.getResult();
             }
         }, EventValues.TIME_NOW);
 
@@ -171,14 +136,10 @@ public class OtherEvents extends SimpleEvent {
             }
         }, EventValues.TIME_NOW);
 
-        EventValues.registerEventValue(EntityBreedEvent.class, ItemType.class, new Getter<>() {
+        EventValues.registerEventValue(EntityBreedEvent.class, ItemStack.class, new Getter<>() {
             @Override
-            public @Nullable ItemType get(EntityBreedEvent breedEvent) {
-                ItemStack bredWith = breedEvent.getBredWith();
-                if (bredWith != null) {
-                    return new ItemType(bredWith);
-                }
-                return null;
+            public @Nullable ItemStack get(EntityBreedEvent breedEvent) {
+                return breedEvent.getBredWith();
             }
         }, EventValues.TIME_NOW);
 
@@ -292,7 +253,7 @@ public class OtherEvents extends SimpleEvent {
                 if (event.getEntity() instanceof LivingEntity livingEntity) {
                     ticks = livingEntity.getRemainingAir();
                 }
-                return Timespan.fromTicks(ticks);
+                return new Timespan(TimePeriod.TICK, ticks);
             }
         }, EventValues.TIME_PAST);
 
@@ -306,7 +267,7 @@ public class OtherEvents extends SimpleEvent {
         EventValues.registerEventValue(EntityAirChangeEvent.class, Timespan.class, new Getter<>() {
             @Override
             public Timespan get(EntityAirChangeEvent event) {
-                return Timespan.fromTicks(event.getAmount());
+                return new Timespan(TimePeriod.TICK, event.getAmount());
             }
         }, EventValues.TIME_NOW);
 
@@ -381,15 +342,6 @@ public class OtherEvents extends SimpleEvent {
             @Override
             public @Nullable Projectile get(EntityShootBowEvent event) {
                 if (event.getProjectile() instanceof Projectile projectile) return projectile;
-                return null;
-            }
-        }, EventValues.TIME_NOW);
-
-        EventValues.registerEventValue(EntityShootBowEvent.class, ItemType.class, new Getter<>() {
-            @Override
-            public @Nullable ItemType get(EntityShootBowEvent event) {
-                ItemStack consumable = event.getConsumable();
-                if (consumable != null) return new ItemType(consumable);
                 return null;
             }
         }, EventValues.TIME_NOW);
@@ -490,18 +442,18 @@ public class OtherEvents extends SimpleEvent {
             }
         }, EventValues.TIME_PAST);
 
-        EventValues.registerEventValue(BlockExplodeEvent.class, ItemType.class, new Getter<>() {
+        EventValues.registerEventValue(BlockExplodeEvent.class, Material.class, new Getter<>() {
             @Override
-            public ItemType get(BlockExplodeEvent event) {
-                return new ItemType(event.getBlock().getType());
+            public Material get(BlockExplodeEvent event) {
+                return event.getBlock().getType();
             }
         }, EventValues.TIME_NOW);
 
-        EventValues.registerEventValue(BlockExplodeEvent.class, ItemType.class, new Getter<>() {
+        EventValues.registerEventValue(BlockExplodeEvent.class, Material.class, new Getter<>() {
             @Override
-            public @NotNull ItemType get(BlockExplodeEvent event) {
+            public @NotNull Material get(BlockExplodeEvent event) {
                 BlockState explodedBlockState = event.getExplodedBlockState();
-                return new ItemType(explodedBlockState.getType());
+                return explodedBlockState.getType();
             }
         }, EventValues.TIME_PAST);
 

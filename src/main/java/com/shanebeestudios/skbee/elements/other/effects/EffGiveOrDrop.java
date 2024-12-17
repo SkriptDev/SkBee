@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.other.effects;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -30,16 +29,16 @@ import java.util.List;
 public class EffGiveOrDrop extends Effect {
 
     static {
-        Skript.registerEffect(EffGiveOrDrop.class, "give or drop %itemtypes% to %players%");
+        Skript.registerEffect(EffGiveOrDrop.class, "give or drop %itemstacks% to %players%");
     }
 
-    private Expression<ItemType> itemTypes;
+    private Expression<ItemStack> itemTypes;
     private Expression<Player> players;
 
     @SuppressWarnings({"NullableProblems", "unchecked"})
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        this.itemTypes = (Expression<ItemType>) exprs[0];
+        this.itemTypes = (Expression<ItemStack>) exprs[0];
         this.players = (Expression<Player>) exprs[1];
         return true;
     }

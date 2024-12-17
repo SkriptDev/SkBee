@@ -1,6 +1,5 @@
 package com.shanebeestudios.skbee.elements.other.expressions;
 
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -14,6 +13,7 @@ import com.shanebeestudios.skbee.api.util.BlockDataUtils;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,15 +30,15 @@ public class ExprBlockDataItemTags extends SimpleExpression<String> {
 
     static {
         PropertyExpression.register(ExprBlockDataItemTags.class, String.class,
-                "item [block[ ]](data|state) tags", "itemtypes");
+            "item [block[ ]](data|state) tags", "itemstacks");
     }
 
-    private Expression<ItemType> itemTypes;
+    private Expression<ItemStack> itemTypes;
 
     @SuppressWarnings({"NullableProblems", "unchecked"})
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        this.itemTypes = (Expression<ItemType>) exprs[0];
+        this.itemTypes = (Expression<ItemStack>) exprs[0];
         return true;
     }
 
@@ -46,10 +46,10 @@ public class ExprBlockDataItemTags extends SimpleExpression<String> {
     @Override
     protected @Nullable String[] get(Event event) {
         List<String> tags = new ArrayList<>();
-        for (ItemType itemType : this.itemTypes.getArray(event)) {
+        for (ItemStack itemType : this.itemTypes.getArray(event)) {
             if (!(itemType.getItemMeta() instanceof BlockDataMeta blockDataMeta)) continue;
 
-            Material blockForm = BlockDataUtils.getBlockForm(itemType.getMaterial());
+            Material blockForm = BlockDataUtils.getBlockForm(itemType.getType());
             if (!blockForm.isBlock()) continue;
 
             BlockData blockData = blockDataMeta.getBlockData(blockForm);

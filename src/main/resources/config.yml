@@ -49,14 +49,8 @@ elements:
     # Enable different Item Component elements
     item-component: true
 
-    # Enable MinecraftTag Elements
-    minecraft-tag: true
-
     # Enable NBT elements
     nbt: true
-
-    # Enable particle elements
-    particle: true
 
     # Enable RayTrace elements
     raytrace: true
@@ -89,10 +83,6 @@ elements:
 
     # Enable villager/merchant elements
     villager: true
-
-    # Enable VirtualFurnace elements
-    # This feature is semi-experimental, please use with caution
-    virtual-furnace: false
 
     # Enable world border elements
     world-border: true

@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.api.nbt;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.registrations.Classes;
 import com.shanebeestudios.skbee.SkBee;
 import com.shanebeestudios.skbee.api.util.Pair;
@@ -206,21 +205,21 @@ public class NBTApi {
     }
 
     /**
-     * Merge an {@link NBTCompound} into an {@link ItemType}
+     * Merge an {@link NBTCompound} into an {@link ItemStack}
      *
-     * @param itemType    ItemType to add NBT to
+     * @param itemStack   ItemStack to add NBT to
      * @param nbtCompound NBT to add to ItemType
      * @param custom      Should be stored within the "minecraft:custom_data" component (1.20.5+)
      * @return ItemType with NBT merged into
      */
-    public static @Nullable ItemType getItemTypeWithNBT(ItemType itemType, NBTCompound nbtCompound, boolean custom) {
-        NBTContainer itemNBT = NBTItem.convertItemtoNBT(itemType.getRandom());
+    public static @Nullable ItemStack getItemStackWithNBT(ItemStack itemStack, NBTCompound nbtCompound, boolean custom) {
+        NBTContainer itemNBT = NBTItem.convertItemtoNBT(itemStack);
 
         // Full NBT
         if (nbtCompound.hasTag(TAG_NAME)) {
             if (nbtCompound.hasTag("id") && !itemNBT.getString("id").equalsIgnoreCase(nbtCompound.getString("id"))) {
                 // NBT compounds not the same item
-                return itemType;
+                return itemStack;
             }
             itemNBT.mergeCompound(nbtCompound);
         } else {
@@ -231,7 +230,7 @@ public class NBTApi {
         }
         ItemStack newItemStack = NBTItem.convertNBTtoItem(itemNBT);
         if (newItemStack == null) return null;
-        return new ItemType(newItemStack);
+        return newItemStack;
     }
 
     /**

@@ -29,7 +29,7 @@ import java.util.UUID;
 @SuppressWarnings("rawtypes")
 @Name("TextComponent - Hover Event")
 @Description({"Create a new hover event. Can show texts, text components, an item or an entity to a player.",
-    "'showing %itemtype%' requires Minecraft 1.18.2+"})
+    "'showing %itemstacks%' requires Minecraft 1.18.2+"})
 @Examples({"set {_t} to text component from \"Check out my cool tool!\"",
     "add hover event showing player's tool to {_t}",
     "send component {_t} to player"})

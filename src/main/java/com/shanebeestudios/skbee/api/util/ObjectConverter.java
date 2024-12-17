@@ -1,18 +1,13 @@
 package com.shanebeestudios.skbee.api.util;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.bukkitutil.BukkitUnsafe;
-import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.classes.ClassInfo;
-import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.util.StringUtils;
 import com.shanebeestudios.skbee.SkBee;
 import org.bukkit.Bukkit;
 import org.bukkit.GameEvent;
 import org.bukkit.Keyed;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Registry;
@@ -95,26 +90,8 @@ public abstract class ObjectConverter<T> {
             register(DamageType.class, Registry.DAMAGE_TYPE);
         }
         register(Enchantment.class, Registry.ENCHANTMENT);
-        register(EntityData.class, new ObjectConverter<>() {
-            @Override
-            public EntityData<?> get(NamespacedKey key) {
-                EntityType entityType = Registry.ENTITY_TYPE.get(key);
-                if (entityType != null) {
-                    return EntityUtils.toSkriptEntityData(entityType);
-                }
-                return null;
-            }
-        });
         register(EntityType.class, Registry.ENTITY_TYPE);
         register(GameEvent.class, Registry.GAME_EVENT);
-        register(ItemType.class, new ObjectConverter<>() {
-            @Override
-            public ItemType get(NamespacedKey key) {
-                Material mat = BukkitUnsafe.getMaterialFromMinecraftId(key.toString());
-                if (mat != null) return new ItemType(mat);
-                return null;
-            }
-        });
         register(LootTable.class, new ObjectConverter<>() {
             @Override
             public @Nullable LootTable get(NamespacedKey key) {

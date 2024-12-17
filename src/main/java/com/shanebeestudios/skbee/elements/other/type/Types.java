@@ -275,16 +275,6 @@ public class Types {
             .description("Represents the different memories of an entity.",
                 "NOTE: These are auto-generated and may differ between server versions."));
 
-        if (Classes.getExactClassInfo(EquipmentSlot.class) == null) {
-            EnumWrapper<EquipmentSlot> SLOT_ENUM = new EnumWrapper<>(EquipmentSlot.class, null, "slot");
-            Classes.registerClass(SLOT_ENUM.getClassInfo("equipmentslot")
-                .user("equipment ?slots?")
-                .name("Equipment Slot")
-                .description("Represents different slots of an entity.",
-                    "NOTE: These are auto-generated and may differ between server versions.")
-                .since("3.4.0"));
-        }
-
         if (Classes.getExactClassInfo(Action.class) == null) {
             EnumWrapper<Action> ACTION_ENUM = new EnumWrapper<>(Action.class);
             Classes.registerClass(ACTION_ENUM.getClassInfo("blockaction")
@@ -339,23 +329,8 @@ public class Types {
                 .name("Player Spawn Change Reason")
                 .description("Represents the reasons why a player changed their spawn location.",
                     "NOTE: These are auto-generated and may differ between server versions.")
-                .after("damagecause", "damagetype", "itemtype")
+                .after("damagecause", "damagetype", "material")
                 .since("3.4.0"));
-        }
-
-        if (Classes.getExactClassInfo(EntityType.class) == null) {
-            Classes.registerClass(RegistryClassInfo.create(Registry.ENTITY_TYPE, EntityType.class, "minecraftentitytype")
-                .user("minecraft ?entity ?types?")
-                .name("Minecraft - EntityType")
-                .description("Represents a Minecraft entity.",
-                    "These differ slightly from Skript's EntityType as the names match Minecraft namespaces.",
-                    "These also support the use of the Minecraft namespace as well as underscores.",
-                    "NOTE: These are auto-generated and may differ between server versions.")
-                .examples("mc spawn sheep at player",
-                    "mc spawn minecraft:sheep at player",
-                    "mc spawn minecraft:armor_stand at player")
-                .after("entitydata", "entitydata")
-                .since("3.5.0"));
         }
 
         Classes.registerClass(new ClassInfo<>(Color.class, "bukkitcolor")
@@ -386,15 +361,6 @@ public class Types {
                     return toString(bukkitColor, 0);
                 }
             }));
-
-        EnumWrapper<TreeType> TREE_TYPE = new EnumWrapper<>(TreeType.class, "", "tree");
-        Classes.registerClass(TREE_TYPE.getClassInfo("bukkittreetype")
-            .user("bukkit ?tree ?types?")
-            .name("Bukkit Tree Type")
-            .description("Represents the different types of trees.",
-                "NOTE: These are auto-generated and may differ between server versions.")
-            .after("structuretype")
-            .since("3.5.3"));
 
         EnumWrapper<Pose> POSE = new EnumWrapper<>(Pose.class, "", "pose");
         Classes.registerClass(POSE.getClassInfo("pose")

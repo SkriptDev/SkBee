@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.itemcomponent.effects;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -10,13 +9,16 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import io.papermc.paper.datacomponent.DataComponentType;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-@Name("ItemComponent - Clear Components")
-@Description({"Clear components of an item. Requires Minecraft 1.21+",
-    "**NOTE**: This will **NOT** clear vanilla components, it will only clear custom added components."})
+@SuppressWarnings("UnstableApiUsage")
+@Name("ItemComponent - Clear/Reset Components")
+@Description({"Clear/reset components of an ItemStack.",
+    "Clear will remove the component from the item completely.",
+    "Reset will reset the component back to the original vanilla value."})
 @Examples({"clear food component of player's tool",
     "clear tool component of player's tool",
     "clear attribute modifier components of player's tool"})
@@ -24,42 +26,40 @@ import org.jetbrains.annotations.NotNull;
 public class EffClearComponent extends Effect {
 
     static {
-        Skript.registerEffect(EffClearComponent.class, "clear (:food|:tool|attribute modifier) component[s] of %itemtypes%");
+        Skript.registerEffect(EffClearComponent.class,
+            "(clear|:reset) %datacomponenttypes% component[s] of %itemstacks%");
     }
 
-    private int type;
-    private Expression<ItemType> itemTypes;
+    private boolean reset;
+    private Expression<DataComponentType> componentTypes;
+    private Expression<ItemStack> itemTypes;
 
-    @SuppressWarnings({"NullableProblems", "unchecked"})
+    @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        this.type = parseResult.hasTag("food") ? 0 : parseResult.hasTag("tool") ? 1 : 2;
-        this.itemTypes = (Expression<ItemType>) exprs[0];
+        this.reset = parseResult.hasTag("reset");
+        this.componentTypes = (Expression<DataComponentType>) exprs[0];
+        this.itemTypes = (Expression<ItemStack>) exprs[1];
         return true;
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     protected void execute(Event event) {
-        for (ItemType itemType : this.itemTypes.getArray(event)) {
-            ItemMeta itemMeta = itemType.getItemMeta();
-            switch (this.type) {
-                case 0 -> itemMeta.setFood(null);
-                case 1 -> itemMeta.setTool(null);
-                default -> itemMeta.setAttributeModifiers(null);
+        for (ItemStack itemStack : this.itemTypes.getArray(event)) {
+            for (DataComponentType dataComponentType : this.componentTypes.getArray(event)) {
+                if (this.reset) {
+                    itemStack.resetData(dataComponentType);
+                } else {
+                    itemStack.unsetData(dataComponentType);
+                }
             }
-            itemType.setItemMeta(itemMeta);
         }
     }
 
     @Override
     public @NotNull String toString(Event e, boolean d) {
-        String type = switch (this.type) {
-            case 0 -> "food";
-            case 1 -> "tool";
-            default -> "attribute modifiers";
-        };
-        return "clear " + type + " components of " + this.itemTypes.toString(e,d);
+        String clear = this.reset ? "reset " : "clear ";
+        return clear + this.componentTypes.toString(e, d) + " components of " + this.itemTypes.toString(e, d);
     }
 
 }

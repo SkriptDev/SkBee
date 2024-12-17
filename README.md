@@ -1,6 +1,6 @@
 # SkBee
 
-**SkBee** is a [**Skript**](https://github.com/SkriptLang/Skript) addon that aims to add more useful elements to Skript.
+**SkBee** is a [**Skript-Three**](https://github.com/SkriptDev/Skript) addon that aims to add more useful elements to Skript.
 
 ## Elements
 This is only a small list of the many things included

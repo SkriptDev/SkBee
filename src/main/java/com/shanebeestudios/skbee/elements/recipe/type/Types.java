@@ -1,6 +1,5 @@
 package com.shanebeestudios.skbee.elements.recipe.type;
 
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
 import ch.njol.skript.lang.ParseContext;
@@ -23,43 +22,43 @@ public class Types {
 
     static {
         Classes.registerClass(new ClassInfo<>(RecipeChoice.class, "recipechoice")
-                .name("Recipe Choice")
-                .user("recipe ?choices?")
-                .description("Represents an Exact/Material Choice.",
-                        "MaterialChoice represents a set of materials/minecraft tags which can be used in some recipes.",
-                        "ExactChoice represents a special ItemStack used in some recipes.",
-                        "Requires Minecraft 1.13+")
-                .usage("see material choice expression")
-                .examples("set {_a} to material choice of diamond sword, diamond shovel and diamond hoe",
-                        "set {_a} to material choice of every sword",
-                        "set {_a} to material choice of minecraft tag \"doors\"")
-                .after("itemtype", "itemstack")
-                .since("1.10.0")
-                .parser(new Parser<>() {
+            .name("Recipe Choice")
+            .user("recipe ?choices?")
+            .description("Represents an Exact/Material Choice.",
+                "MaterialChoice represents a set of materials/minecraft tags which can be used in some recipes.",
+                "ExactChoice represents a special ItemStack used in some recipes.",
+                "Requires Minecraft 1.13+")
+            .usage("see material choice expression")
+            .examples("set {_a} to material choice of diamond sword, diamond shovel and diamond hoe",
+                "set {_a} to material choice of every sword",
+                "set {_a} to material choice of minecraft tag \"doors\"")
+            .after("material", "itemstack")
+            .since("1.10.0")
+            .parser(new Parser<>() {
 
-                    @SuppressWarnings("NullableProblems")
-                    @Override
-                    public boolean canParse(ParseContext context) {
-                        return false;
-                    }
+                @SuppressWarnings("NullableProblems")
+                @Override
+                public boolean canParse(ParseContext context) {
+                    return false;
+                }
 
-                    @Override
-                    public @NotNull String toString(@NotNull RecipeChoice matChoice, int flags) {
-                        return recipeChoiceToString(matChoice);
-                    }
+                @Override
+                public @NotNull String toString(@NotNull RecipeChoice matChoice, int flags) {
+                    return recipeChoiceToString(matChoice);
+                }
 
-                    @Override
-                    public @NotNull String toVariableNameString(RecipeChoice matChoice) {
-                        return "recipechoice:" + toString(matChoice, 0);
-                    }
-                }));
+                @Override
+                public @NotNull String toVariableNameString(RecipeChoice matChoice) {
+                    return "recipechoice:" + toString(matChoice, 0);
+                }
+            }));
 
         EnumWrapper<RecipeType> RECIPE_TYPE_ENUM = new EnumWrapper<>(RecipeType.class);
         Classes.registerClass(RECIPE_TYPE_ENUM.getClassInfo("recipetype")
-                .user("recipe ?types?")
-                .name("Recipe Type")
-                .description("Represents the types of recipes.")
-                .since("2.6.0"));
+            .user("recipe ?types?")
+            .name("Recipe Type")
+            .description("Represents the types of recipes.")
+            .since("2.6.0"));
 
         // CONVERTERS
         Converters.registerConverter(ItemStack.class, RecipeChoice.class, new Converter<>() {
@@ -76,10 +75,10 @@ public class Types {
     private static String recipeChoiceToString(RecipeChoice recipeChoice) {
         List<String> itemTypes = new ArrayList<>();
         if (recipeChoice instanceof MaterialChoice materialChoice) {
-            materialChoice.getChoices().forEach(material -> itemTypes.add(new ItemType(material).toString()));
+            materialChoice.getChoices().forEach(material -> itemTypes.add(material.getKey().toString()));
             return String.format("MaterialChoice{choices=[%s]}", StringUtils.join(itemTypes, ", "));
         } else if (recipeChoice instanceof ExactChoice exactChoice) {
-            exactChoice.getChoices().forEach(material -> itemTypes.add(new ItemType(material).toString()));
+            exactChoice.getChoices().forEach(itemStack -> itemTypes.add(itemStack.getType().getKey().toString()));
             return String.format("ExactChoice{choices=[%s]}", StringUtils.join(itemTypes, ", "));
         }
         throw new IllegalStateException("This shouldnt happen!!!");

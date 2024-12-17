@@ -22,12 +22,13 @@ test "SkBee - simple nbt compound":
     delete random entity of {_e}
     delete {_n}
 
-    set {_i} to diamond sword with custom model data 1
+    set {_i} to itemstack of diamond sword
+    set max damage of {_i} to 100
     set {_n} to nbt of {_i}
 
     # Test that tag of item nbt is set
-    assert int tag "minecraft:custom_model_data" of {_n} is set with "tag ""minecraft:custom_model_data"" of an item should be set"
-    assert int tag "minecraft:custom_model_data" of {_n} = 1 with "tag ""minecraft:custom_model_data"" of an item should be 1"
+    assert int tag "minecraft:max_damage" of {_n} is set with "tag ""minecraft:max_damage"" of an item should be set"
+    assert int tag "minecraft:max_damage" of {_n} = 100 with "tag ""minecraft:max_damage"" of an item should be 100"
 
     # Test that Pretty nbt works
     set {_pretty} to pretty nbt of {_n}
@@ -60,3 +61,9 @@ test "SkBee - NBTCustomBlock":
     assert size of nbt tags of nbt of block at {_l} = 0 with "size of nbt tags of block should be 0"
 
     assert size of nbt tags of nbt of chunk at {_l} = 0 with "size of nbt tags of chunk should be 0"
+
+test "SkBee - NBT Item":
+    # Paper ItemStack issue causing error before, hopefully fixed now
+    set {_i} to itemstack of diamond sword
+    assert pretty nbt of vanilla nbt of {_i} with split "  " is set with "Pretty nbt of item should be set"
+    assert pretty nbt of vanilla nbt of itemstack of diamond axe with split "  "  is set with "Pretty nbt of item should be set"

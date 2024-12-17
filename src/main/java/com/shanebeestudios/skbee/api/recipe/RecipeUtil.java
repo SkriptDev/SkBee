@@ -1,16 +1,13 @@
 package com.shanebeestudios.skbee.api.recipe;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.slot.Slot;
 import com.shanebeestudios.skbee.api.util.Util;
 import com.shanebeestudios.skbee.elements.recipe.sections.SecRecipeSmithing;
 import io.papermc.paper.potion.PotionMix;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -22,8 +19,6 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.SmithingTransformRecipe;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +37,10 @@ public class RecipeUtil {
      */
     @Nullable
     public static RecipeChoice getRecipeChoice(Object object) {
-        if (object instanceof ItemStack itemStack) {
+        if (object instanceof Material material) {
+            if (!material.isItem() || material.isAir()) return null;
+            return new MaterialChoice(material);
+        } else if (object instanceof ItemStack itemStack) {
             Material material = itemStack.getType();
             if (!material.isItem() || material.isAir()) return null;
 
@@ -51,10 +49,6 @@ public class RecipeUtil {
             } else {
                 return new ExactChoice(itemStack);
             }
-        } else if (object instanceof Slot slot) {
-            return getRecipeChoice(slot.getItem());
-        } else if (object instanceof ItemType itemType) {
-            return getRecipeChoice(itemType.getRandom());
         } else if (object instanceof RecipeChoice choice) {
             return choice;
         }
@@ -113,7 +107,7 @@ public class RecipeUtil {
         if (HAS_CATEGORY) {
             log(" - &7Category: &r\"&6%s&r\"", recipe.getCategory());
         }
-        log(" - &7CookTime: &b%s", Timespan.fromTicks(recipe.getCookingTime()));
+        log(" - &7CookTime: &b%s", new Timespan(Timespan.TimePeriod.TICK, recipe.getCookingTime()));
         log(" - &7Experience: &b%s", recipe.getExperience());
         log(" - &7Ingredients: %s", getFancy(recipe.getInputChoice()));
     }
@@ -174,7 +168,7 @@ public class RecipeUtil {
      * @param potionMix PotionMix to log
      */
     public static void logBrewingRecipe(PotionMix potionMix) {
-        log("&aRegistered new shaped recipe: &7(&b%s&7)", potionMix.getKey().toString());
+        log("&aRegistered new brewing recipe: &7(&b%s&7)", potionMix.getKey().toString());
         log(" - &7Result: &e%s", potionMix.getResult());
         log(" - &7Ingredient: %s", getFancy(potionMix.getIngredient()));
         log(" - &7Input: %s", getFancy(potionMix.getInput()));
@@ -204,22 +198,6 @@ public class RecipeUtil {
             .replace("[", "&r[&b")
             .replace(",", "&r,&b")
             .replace("]}", "&r]");
-    }
-
-    /**
-     * Check if a {@link Tag} is a Material Tag
-     *
-     * @param object Object to check
-     * @return True if material tag
-     */
-    public static boolean isMaterialTag(Object object) {
-        if (object instanceof Tag<?> tag) {
-            ParameterizedType superC = (ParameterizedType) tag.getClass().getGenericSuperclass();
-            for (Type arg : superC.getActualTypeArguments()) {
-                if (arg.equals(Material.class)) return true;
-            }
-        }
-        return false;
     }
 
     /**

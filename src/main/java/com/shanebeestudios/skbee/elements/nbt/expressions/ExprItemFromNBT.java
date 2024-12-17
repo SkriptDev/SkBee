@@ -1,7 +1,6 @@
 package com.shanebeestudios.skbee.elements.nbt.expressions;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
@@ -27,12 +26,12 @@ import org.jetbrains.annotations.NotNull;
     "loop {_nbt::*}",
     "\tset {_i} to item from nbt loop-value"})
 @Since("1.4.10")
-public class ExprItemFromNBT extends PropertyExpression<NBTCompound, ItemType> {
+public class ExprItemFromNBT extends PropertyExpression<NBTCompound, ItemStack> {
 
     static {
-        Skript.registerExpression(ExprItemFromNBT.class, ItemType.class, ExpressionType.PROPERTY,
-            "item[s] (from|of) nbt[s] %nbtcompounds%",
-            "nbt item[s] (from|of) %nbtcompounds%");
+        Skript.registerExpression(ExprItemFromNBT.class, ItemStack.class, ExpressionType.PROPERTY,
+            "item[stack][s] (from|of) nbt[s] %nbtcompounds%",
+            "nbt item[stack][s] (from|of) %nbtcompounds%");
     }
 
     @SuppressWarnings({"null", "unchecked"})
@@ -43,19 +42,19 @@ public class ExprItemFromNBT extends PropertyExpression<NBTCompound, ItemType> {
     }
 
     @Override
-    protected ItemType @NotNull [] get(@NotNull Event event, NBTCompound @NotNull [] source) {
+    protected ItemStack @NotNull [] get(@NotNull Event event, NBTCompound @NotNull [] source) {
         return get(source, nbtCompound -> {
             if (nbtCompound.hasTag("id")) {
                 ItemStack itemStack = NBTItem.convertNBTtoItem(nbtCompound);
-                if (itemStack != null) return new ItemType(itemStack);
+                if (itemStack != null) return itemStack;
             }
             return null;
         });
     }
 
     @Override
-    public @NotNull Class<? extends ItemType> getReturnType() {
-        return ItemType.class;
+    public @NotNull Class<? extends ItemStack> getReturnType() {
+        return ItemStack.class;
     }
 
     @Override

@@ -4,7 +4,6 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.localization.Noun;
 import ch.njol.skript.registrations.Classes;
-import ch.njol.skript.test.runner.TestMode;
 import ch.njol.skript.util.Version;
 import com.shanebeestudios.skbee.api.listener.EntityListener;
 import com.shanebeestudios.skbee.api.listener.NBTListener;
@@ -16,9 +15,7 @@ import com.shanebeestudios.skbee.api.util.SkriptUtils;
 import com.shanebeestudios.skbee.api.util.Util;
 import com.shanebeestudios.skbee.config.BoundConfig;
 import com.shanebeestudios.skbee.config.Config;
-import com.shanebeestudios.skbee.elements.virtualfurnace.listener.VirtualFurnaceListener;
 import com.shanebeestudios.skbee.elements.worldcreator.objects.BeeWorldConfig;
-import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -62,9 +59,9 @@ public class AddonLoader {
             return false;
         }
         Version skriptVersion = Skript.getVersion();
-        if (skriptVersion.isSmallerThan(new Version(2, 7))) {
+        if (skriptVersion.isSmallerThan(new Version(2, 9999))) {
             Util.log("&cDependency Skript outdated, plugin disabling.");
-            Util.log("&eSkBee requires Skript 2.7+ but found Skript " + skriptVersion);
+            Util.log("&eSkBee requires Skript 3.0+ but found Skript " + skriptVersion);
             return false;
         }
         if (!Skript.isAcceptRegistrations()) {
@@ -113,18 +110,15 @@ public class AddonLoader {
         loadFishingElements();
         loadGameEventElements();
         loadItemComponentElements();
-        loadParticleElements();
         loadRayTraceElements();
         loadRecipeElements();
         loadScoreboardElements();
         loadScoreboardObjectiveElements();
         loadStatisticElements();
         loadStructureElements();
-        loadTagElements();
         loadTeamElements();
         loadTickManagerElements();
         loadVillagerElements();
-        loadVirtualFurnaceElements();
         loadWorldBorderElements();
         loadWorldCreatorElements();
         loadChunkGenElements();
@@ -322,29 +316,6 @@ public class AddonLoader {
         }
     }
 
-    private void loadVirtualFurnaceElements() {
-        // Force load if running tests as this is defaulted to false in the config
-        if (!this.config.ELEMENTS_VIRTUAL_FURNACE && !TestMode.ENABLED) {
-            Util.logLoading("&5Virtual Furnace Elements &cdisabled via config");
-            return;
-        }
-        // PaperMC check
-        if (!Skript.classExists("net.kyori.adventure.text.Component")) {
-            Util.logLoading("&5Virtual Furnace Elements &cdisabled");
-            Util.logLoading("&7- Virtual Furnace require a PaperMC server.");
-            return;
-        }
-        try {
-            this.plugin.virtualFurnaceAPI = new VirtualFurnaceAPI(this.plugin, true);
-            pluginManager.registerEvents(new VirtualFurnaceListener(), this.plugin);
-            addon.loadClasses("com.shanebeestudios.skbee.elements.virtualfurnace");
-            Util.logLoading("&5Virtual Furnace Elements &asuccessfully loaded");
-        } catch (IOException e) {
-            e.printStackTrace();
-            pluginManager.disablePlugin(this.plugin);
-        }
-    }
-
     private void loadOtherElements() {
         try {
             pluginManager.registerEvents(new EntityListener(), this.plugin);
@@ -486,34 +457,6 @@ public class AddonLoader {
         }
     }
 
-    private void loadParticleElements() {
-        if (!this.config.ELEMENTS_PARTICLE) {
-            Util.logLoading("&5Particle Elements &cdisabled via config");
-            return;
-        }
-        try {
-            addon.loadClasses("com.shanebeestudios.skbee.elements.particle");
-            Util.logLoading("&5Particle Elements &asuccessfully loaded");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            pluginManager.disablePlugin(this.plugin);
-        }
-    }
-
-    private void loadTagElements() {
-        if (!this.config.ELEMENTS_MINECRAFT_TAG) {
-            Util.logLoading("&5Minecraft Tag elements &cdisabled via config");
-            return;
-        }
-        try {
-            addon.loadClasses("com.shanebeestudios.skbee.elements.tag");
-            Util.logLoading("&5Minecraft Tag elements &asuccessfully loaded");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            pluginManager.disablePlugin(this.plugin);
-        }
-    }
-
     private void loadRayTraceElements() {
         if (!this.config.ELEMENTS_RAYTRACE) {
             Util.logLoading("&5RayTrace elements &cdisabled via config");
@@ -586,6 +529,11 @@ public class AddonLoader {
     private void loadItemComponentElements() {
         if (!this.config.ELEMENTS_ITEM_COMPONENT) {
             Util.logLoading("&5Item Component elements &cdisabled via config");
+            return;
+        }
+        if (!Skript.classExists("io.papermc.paper.datacomponent.DataComponentTypes")) {
+            Util.logLoading("&5Item Component elements &cdisabled");
+            Util.logLoading("&7 - &eRequires Minecraft 1.21.4+");
             return;
         }
         try {
