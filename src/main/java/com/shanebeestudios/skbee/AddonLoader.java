@@ -116,7 +116,6 @@ public class AddonLoader {
         loadScoreboardObjectiveElements();
         loadStatisticElements();
         loadStructureElements();
-        loadTagElements();
         loadTeamElements();
         loadTickManagerElements();
         loadVillagerElements();
@@ -452,20 +451,6 @@ public class AddonLoader {
         try {
             addon.loadClasses("com.shanebeestudios.skbee.elements.worldborder");
             Util.logLoading("&5World Border Elements &asuccessfully loaded");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            pluginManager.disablePlugin(this.plugin);
-        }
-    }
-
-    private void loadTagElements() {
-        if (!this.config.ELEMENTS_MINECRAFT_TAG) {
-            Util.logLoading("&5Minecraft Tag elements &cdisabled via config");
-            return;
-        }
-        try {
-            addon.loadClasses("com.shanebeestudios.skbee.elements.tag");
-            Util.logLoading("&5Minecraft Tag elements &asuccessfully loaded");
         } catch (IOException ex) {
             ex.printStackTrace();
             pluginManager.disablePlugin(this.plugin);

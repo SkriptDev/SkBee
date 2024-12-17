@@ -17,11 +17,9 @@ import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.set.RegistrySet;
-import io.papermc.paper.registry.tag.TagKey;
+import io.papermc.paper.registry.tag.Tag;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.Material;
-import org.bukkit.Registry;
-import org.bukkit.Tag;
 import org.bukkit.block.BlockType;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +31,7 @@ import org.skriptlang.skript.lang.entry.util.ExpressionEntryData;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"UnstableApiUsage", "NullableProblems"})
 @Name("ItemComponent - Tool Rule Apply")
 @Description({"Apply rules to a tool component. You can add as many as you'd like.",
     "See [**McWiki Tool Component**](https://minecraft.wiki/w/Data_component_format#tool) for more details.",
@@ -75,7 +73,7 @@ public class SecToolRule extends Section {
     }
 
     private Expression<Material> blockTypes;
-    private Expression<Tag<Material>> blockKey;
+    private Expression<Tag<BlockType>> blockKey;
     private Expression<Number> speed;
     private Expression<Boolean> correctForDrops;
 
@@ -91,7 +89,7 @@ public class SecToolRule extends Section {
         if (container == null) return false;
 
         this.blockTypes = (Expression<Material>) container.getOptional("block types", false);
-        this.blockKey = (Expression<Tag<Material>>) container.getOptional("block tag", false);
+        this.blockKey = (Expression<Tag<BlockType>>) container.getOptional("block tag", false);
         if (this.blockTypes == null && this.blockKey == null) {
             Skript.error("Either a 'block types' or 'block tag' entry needs to be used.");
             return false;
@@ -126,11 +124,9 @@ public class SecToolRule extends Section {
                 toolBuilder.addRule(Tool.rule(keys, speed, correctForDrops));
 
             } else if (this.blockKey != null) {
-                Tag<Material> bukkitTag = this.blockKey.getSingle(event);
-                if (bukkitTag != null) {
-                    TagKey<BlockType> tagKey = TagKey.create(RegistryKey.BLOCK, bukkitTag.key());
-                    io.papermc.paper.registry.tag.Tag<BlockType> tag = Registry.BLOCK.getTag(tagKey);
-                    Tool.Rule rule = Tool.rule(tag, speed, correctForDrops);
+                Tag<BlockType> blockTag = this.blockKey.getSingle(event);
+                if (blockTag != null) {
+                    Tool.Rule rule = Tool.rule(blockTag, speed, correctForDrops);
                     toolBuilder.addRule(rule);
                 }
             }

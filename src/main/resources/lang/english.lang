@@ -44,13 +44,11 @@ types:
     merchantinventory: merchant inventor¦y¦ies
     merchantrecipe: merchant recipe¦s
     minecraftentitytype: minecraft entity type¦s
-    minecrafttag: minecraft tag¦s
     mirror: mirror¦s
     namespacedkey: namespacedkey¦s
     nbtcompound: nbt compound¦s @an
     nbttype: nbt type¦s @an
     objective: objective¦s
-    particle: particle¦s @-
     playerspawnchangereason: player spawn change reason¦s
     pose: pose¦s
     potioneffectcause: potion effect cause¦s

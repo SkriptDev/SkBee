@@ -8,7 +8,6 @@ import io.papermc.paper.potion.PotionMix;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -20,8 +19,6 @@ import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.SmithingTransformRecipe;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -171,7 +168,7 @@ public class RecipeUtil {
      * @param potionMix PotionMix to log
      */
     public static void logBrewingRecipe(PotionMix potionMix) {
-        log("&aRegistered new shaped recipe: &7(&b%s&7)", potionMix.getKey().toString());
+        log("&aRegistered new brewing recipe: &7(&b%s&7)", potionMix.getKey().toString());
         log(" - &7Result: &e%s", potionMix.getResult());
         log(" - &7Ingredient: %s", getFancy(potionMix.getIngredient()));
         log(" - &7Input: %s", getFancy(potionMix.getInput()));
@@ -201,22 +198,6 @@ public class RecipeUtil {
             .replace("[", "&r[&b")
             .replace(",", "&r,&b")
             .replace("]}", "&r]");
-    }
-
-    /**
-     * Check if a {@link Tag} is a Material Tag
-     *
-     * @param object Object to check
-     * @return True if material tag
-     */
-    public static boolean isMaterialTag(Object object) {
-        if (object instanceof Tag<?> tag) {
-            ParameterizedType superC = (ParameterizedType) tag.getClass().getGenericSuperclass();
-            for (Type arg : superC.getActualTypeArguments()) {
-                if (arg.equals(Material.class)) return true;
-            }
-        }
-        return false;
     }
 
     /**

@@ -1,0 +1,15 @@
+test "SkBee - Material choice expression":
+
+    set {_choice} to material choice of oak planks and spruce planks
+    assert {_choice} is set with "Choice of some planks should be set"
+    delete {_choice}
+
+    # Tags only available on 1.21+
+    parse if running minecraft "1.21":
+        set {_choice} to material choice of item registry tag "minecraft:wool"
+        assert {_choice} is set with "Material choice of tag 'minecraft:wool' should be set"
+        delete {_choice}
+
+        set {_choice} to material choice of item registry tag "minecraft:arrows"
+        assert {_choice} is set with "Material choice of tag 'minecraft:arrows' should be set"
+        delete {_choice}

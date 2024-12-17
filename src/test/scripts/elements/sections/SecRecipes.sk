@@ -1,0 +1,32 @@
+test "SkBee - recipe sections":
+    # Testing that these don't error
+
+    register shaped recipe:
+        id: "my_test_recipe"
+        result: itemstack of diamond sword named "BOB"
+        shape: " a ", " b ", "ccc"
+        ingredients:
+            set ingredient of "a" to itemstack of stick
+            set ingredient of "b" to material choice of item registry tag "minecraft:arrows"
+            set ingredient of "c" to material choice of oak planks and spruce planks
+
+    register shapeless recipe:
+        id: "custom:string"
+        result: 4 of string
+        ingredients:
+            add material choice of (item registry tag "minecraft:wool") to ingredients
+
+    register new furnace recipe:
+        id: "sieve:gravel_to_sand"
+        result: 1 of sand
+        input: gravel
+        group: "sieve"
+        cooktime: 1 minecraft day
+        experience: 6
+        category: "blocks"
+
+    register brewing recipe:
+        id: "my_brewing_recipe"
+        result: 1 of potion
+        ingredient: glowstone dust
+        input: potato
